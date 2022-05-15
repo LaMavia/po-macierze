@@ -1,6 +1,9 @@
 package pl.edu.mimuw.matrix.implementations;
 
+import java.util.Arrays;
+
 import pl.edu.mimuw.matrix.IDoubleMatrix;
+import pl.edu.mimuw.matrix.MatrixCellValue;
 import pl.edu.mimuw.matrix.Shape;
 
 public class AntiDiagonal implements IDoubleMatrix {
@@ -23,32 +26,51 @@ public class AntiDiagonal implements IDoubleMatrix {
 
   @Override
   public IDoubleMatrix times(double scalar) {
-    // TODO Auto-generated method stub
-    return null;
+    if (Math.abs(scalar) == 0) {
+      return new Zero(this.shape());
+    }
+
+    if (scalar == 1) {
+      return this;
+    }
+
+    double[] values = this.values.clone();
+
+    for (int i = 0; i < values.length; i++) {
+      values[i] *= scalar;
+    }
+
+    return new AntiDiagonal(values);
   }
 
   @Override
   public IDoubleMatrix plus(IDoubleMatrix other) {
-    // TODO Auto-generated method stub
-    return null;
+    assert other != null;
+
+    return other.plusLeft(this);
   }
 
   @Override
   public IDoubleMatrix plus(double scalar) {
-    // TODO Auto-generated method stub
-    return null;
+    double[][] values = new double[this.size()][this.size()];
+
+    for (int i = 0; i < this.size(); i++) {
+      for (int j = 0; j < this.size(); j++) {
+        values[i][j] = scalar + this.get(i, j);
+      }
+    }
+
+    return new Full(values);
   }
 
   @Override
   public IDoubleMatrix minus(IDoubleMatrix other) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.plus(other.times(-1));
   }
 
   @Override
   public IDoubleMatrix minus(double scalar) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.plus(-scalar);
   }
 
   @Override
@@ -63,12 +85,16 @@ public class AntiDiagonal implements IDoubleMatrix {
     }
   }
 
+  private int indexCompliment(int i) {
+    return this.size() - i - 1;
+  }
+
   @Override
   public double[][] data() {
     double[][] data = new double[this.size()][this.size()];
 
-    for (int i = 0; i < this.values.length; i++) {
-      for (int j = 0; j < this.values.length; j++) {
+    for (int i = 0; i < this.size(); i++) {
+      for (int j = 0; j < this.size(); j++) {
         data[i][j] = this.get(i, j);
       }
     }
@@ -78,38 +104,73 @@ public class AntiDiagonal implements IDoubleMatrix {
 
   @Override
   public double normOne() {
-    // TODO Auto-generated method stub
-    return 0;
+    double max = 0;
+
+    for (double v : this.values) {
+      max = Math.max(Math.abs(v), max);
+    }
+
+    return max;
   }
 
   @Override
   public double normInfinity() {
-    // TODO Auto-generated method stub
-    return 0;
+    return this.normOne();
   }
 
   @Override
   public double frobeniusNorm() {
-    // TODO Auto-generated method stub
-    return 0;
+    double sum = 0;
+
+    for (double v : this.values) {
+      sum += Math.abs(v);
+    }
+
+    return Math.sqrt(sum);
   }
 
   @Override
   public Shape shape() {
-    // TODO Auto-generated method stub
-    return null;
+    return Shape.matrix(this.size(), this.size());
   }
 
   @Override
   public IDoubleMatrix plusLeft(Zero other) {
-    // TODO Auto-generated method stub
-    return null;
+    assert other != null;
+
+    return other.plusLeft(this);
   }
 
   @Override
   public IDoubleMatrix plusLeft(CSR other) {
-    // TODO Auto-generated method stub
-    return null;
+    assert other != null;
+    assert other.shape() == this.shape();
+
+    int index = 0;
+    MatrixCellValue[] values = new MatrixCellValue[other.nnz + 1 + this.size()];
+
+    for (int r = 0; r < this.values.length; r++) {
+      boolean visitedDiagonal = false;
+
+      for (int i = other.getRowStart(r); i < other.getRowEnd(r); i++) {
+        double value = other.getValue(i);
+
+        if (other.getColumn(i) == this.size() - r - 1) {
+          visitedDiagonal = true;
+          value += this.get(r, this.size() - r - 1);
+        }
+
+        values[index++] = new MatrixCellValue(r, other.getColumn(i), value);
+      }
+
+      if (!visitedDiagonal) {
+        values[index++] = new MatrixCellValue(r, this.size() - r - 1, this.get(r, this.size() - r - 1));
+      }
+    }
+
+    values = Arrays.copyOf(values, index);
+
+    return new CSR(this.shape(), values);
   }
 
   @Override

@@ -7,13 +7,13 @@ import pl.edu.mimuw.matrix.MatrixCellValue;
 import pl.edu.mimuw.matrix.Shape;
 
 public class Diagonal implements IDoubleMatrix {
-  private double[] values;
+  protected double[] values;
 
   public Diagonal(double... values) {
     this.values = values;
   }
 
-  private int size() {
+  protected int size() {
     return this.values.length;
   }
 
@@ -51,10 +51,10 @@ public class Diagonal implements IDoubleMatrix {
 
   @Override
   public IDoubleMatrix plus(double scalar) {
-    double[][] values = new double[this.values.length][this.values.length];
+    double[][] values = new double[this.size()][this.size()];
 
-    for (int i = 0; i < this.values.length; i++) {
-      for (int j = 0; j < this.values.length; j++) {
+    for (int i = 0; i < this.size(); i++) {
+      for (int j = 0; j < this.size(); j++) {
         values[i][j] = scalar + this.get(i, j);
       }
     }
@@ -126,7 +126,7 @@ public class Diagonal implements IDoubleMatrix {
 
   @Override
   public Shape shape() {
-    return Shape.matrix(this.values.length, this.values.length);
+    return Shape.matrix(this.size(), this.size());
   }
 
   @Override

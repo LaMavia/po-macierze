@@ -24,7 +24,7 @@ public class Main {
 
   public static void main(String[] args) {
     // /*
-    var _m = new CSR(
+    var m = new CSR(
         Shape.matrix(3, 3),
         MatrixCellValue.cell(0, 0, 7),
         MatrixCellValue.cell(0, 1, 5),
@@ -34,17 +34,12 @@ public class Main {
     //
     // */
 
-    var m = new Full(
-        new double[][] {
-            new double[] { 1, 2, 3 },
-            new double[] { 7, 2, 9 },
-        });
-
     System.out.println(m.shape());
 
     // printMatrix(m);
-    // printMatrix(m.times(new Diagonal(1, 9, 3)));
-    printMatrix(new AntiDiagonal(5, 9, 7).times(new Diagonal(1, 2, 3)));
+    printMatrix(m.plus(new AntiDiagonal(1, 9, 3)));
+
+    // printMatrix(new AntiDiagonal(5, 9, 7).times(new Diagonal(1, 2, 3)));
 
     // var m = new Vector(5, 0, 1, 0, -1, -2, 0, 1, 0);
     /*
