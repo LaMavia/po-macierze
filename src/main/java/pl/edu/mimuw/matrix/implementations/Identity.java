@@ -197,7 +197,6 @@ public class Identity implements IDoubleMatrix {
     assert other.shape() == this.shape();
 
     MatrixCellValue[] values = new MatrixCellValue[this.size * 2];
-
     int index = 0;
 
     for (int i = 0; i < this.size; i++) {

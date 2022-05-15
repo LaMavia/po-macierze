@@ -102,9 +102,9 @@ public class Vector implements IDoubleMatrix {
      * Tak czy inaczej musimy zaalokować tyle elementów, ponieważ jest to
      * możliwy
      * wynik, niezależnie od nnz wektora; np.:
-     * |7 5 0| |1| |12|
+     * |7 5  0|   |1|   |12|
      * |0 3 11| × |1| = | 3|
-     * |0 2 0| |1| | 2|
+     * |0 2  0|   |1|   | 2|
      */
     double[] newValue = new double[otherShape.rows];
 

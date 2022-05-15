@@ -16,7 +16,7 @@ public class Full implements IDoubleMatrix {
     }
 
     this.data = data;
-    this.shape = Shape.matrix(this.data[0].length, this.data.length);
+    this.shape = Shape.matrix(this.data.length, this.data[0].length);
   }
 
   public IDoubleMatrix plusLeft(Zero other) {
@@ -32,8 +32,9 @@ public class Full implements IDoubleMatrix {
 
   @Override
   public IDoubleMatrix times(IDoubleMatrix other) {
-    // TODO Auto-generated method stub
-    return null;
+    assert other != null;
+
+    return other.timesLeft(this);
   }
 
   @Override
@@ -92,7 +93,7 @@ public class Full implements IDoubleMatrix {
 
   @Override
   public Shape shape() {
-    return shape;
+    return this.shape;
   }
 
   @Override

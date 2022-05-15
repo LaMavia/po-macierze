@@ -4,11 +4,21 @@ import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.Shape;
 
 public class AntiDiagonal implements IDoubleMatrix {
+  private double[] values;
+
+  public AntiDiagonal(double... values) {
+    this.values = values;
+  }
+
+  public int size() {
+    return this.values.length;
+  }
 
   @Override
   public IDoubleMatrix times(IDoubleMatrix other) {
-    // TODO Auto-generated method stub
-    return null;
+    assert other != null;
+
+    return other.timesLeft(this);
   }
 
   @Override
@@ -43,14 +53,27 @@ public class AntiDiagonal implements IDoubleMatrix {
 
   @Override
   public double get(int row, int column) {
-    // TODO Auto-generated method stub
-    return 0;
+    assert 0 <= row & row < this.values.length;
+    assert 0 <= column & column < this.values.length;
+
+    if (column == this.size() - row - 1) {
+      return this.values[row];
+    } else {
+      return 0;
+    }
   }
 
   @Override
   public double[][] data() {
-    // TODO Auto-generated method stub
-    return null;
+    double[][] data = new double[this.size()][this.size()];
+
+    for (int i = 0; i < this.values.length; i++) {
+      for (int j = 0; j < this.values.length; j++) {
+        data[i][j] = this.get(i, j);
+      }
+    }
+
+    return data;
   }
 
   @Override

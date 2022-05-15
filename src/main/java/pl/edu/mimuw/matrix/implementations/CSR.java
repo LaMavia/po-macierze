@@ -262,8 +262,9 @@ public class CSR implements IDoubleMatrix {
 
   @Override
   public IDoubleMatrix plusLeft(Zero other) {
-    // TODO Auto-generated method stub
-    return null;
+    assert other != null;
+    
+    return other.plusLeft(this);
   }
 
   @Override

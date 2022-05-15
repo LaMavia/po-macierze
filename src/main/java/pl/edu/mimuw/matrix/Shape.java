@@ -48,4 +48,9 @@ public final class Shape {
     assert rows > 0;
     return new Shape(rows, columns);
   }
+
+  @Override
+  public String toString() {
+    return String.format("Shape {rows = %d, columns = %d}", this.rows, this.columns);
+  }
 }
