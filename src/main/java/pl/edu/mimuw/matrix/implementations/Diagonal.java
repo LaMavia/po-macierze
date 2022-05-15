@@ -77,11 +77,15 @@ public class Diagonal implements IDoubleMatrix {
     assert 0 <= row & row < this.values.length;
     assert 0 <= column & column < this.values.length;
 
-    if (row == column) {
+    if (column == this.indexCompliment(row)) {
       return this.values[row];
     } else {
       return 0;
     }
+  }
+
+  protected int indexCompliment(int i) {
+    return i;
   }
 
   @Override
@@ -143,7 +147,7 @@ public class Diagonal implements IDoubleMatrix {
     assert other.shape() == this.shape();
 
     int index = 0;
-    MatrixCellValue[] values = new MatrixCellValue[other.nnz + 1 + this.values.length];
+    MatrixCellValue[] values = new MatrixCellValue[other.nnz + 1 + this.size()];
 
     for (int r = 0; r < this.values.length; r++) {
       boolean visitedDiagonal = false;
@@ -151,16 +155,16 @@ public class Diagonal implements IDoubleMatrix {
       for (int i = other.getRowStart(r); i < other.getRowEnd(r); i++) {
         double value = other.getValue(i);
 
-        if (other.getColumn(i) == r) {
+        if (other.getColumn(i) == this.indexCompliment(r)) {
           visitedDiagonal = true;
-          value += this.get(r, r);
+          value += this.get(r, this.indexCompliment(r));
         }
 
         values[index++] = new MatrixCellValue(r, other.getColumn(i), value);
       }
 
       if (!visitedDiagonal) {
-        values[index++] = new MatrixCellValue(r, r, this.get(r, r));
+        values[index++] = new MatrixCellValue(r, this.indexCompliment(r), this.get(r, this.indexCompliment(r)));
       }
     }
 
@@ -279,7 +283,7 @@ public class Diagonal implements IDoubleMatrix {
 
     for (int c = 0; c < this.size(); c++) {
       for (int r = 0; r < otherShape.rows; r++) {
-        data[r][c] += this.get(c, c) * other.get(r, c);
+        data[r][c] += this.get(c, this.indexCompliment(c)) * other.get(r, c);
       }
     }
 

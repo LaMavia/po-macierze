@@ -34,10 +34,26 @@ public class Main {
     //
     // */
 
-    System.out.println(m.shape());
+    var a = new CSR(
+      Shape.matrix(3, 3),
+      MatrixCellValue.cell(0, 1, 5),
+      MatrixCellValue.cell(2, 0, 1)
+    );
 
-    // printMatrix(m);
-    printMatrix(m.plus(new AntiDiagonal(1, 9, 3)));
+    var b = new CSR(
+      Shape.matrix(3, 3),
+      MatrixCellValue.cell(2, 1, 9),
+      MatrixCellValue.cell(2, 0, 1),
+      MatrixCellValue.cell(0, 1, 3)
+    );
+
+    printMatrix(a);
+    // printMatrix(b);
+
+    printMatrix(new AntiDiagonal(1, 2, 3).times(a));
+
+    
+    // printMatrix(m.plus(new AntiDiagonal(1, 9, 3)));
 
     // printMatrix(new AntiDiagonal(5, 9, 7).times(new Diagonal(1, 2, 3)));
 

@@ -1,5 +1,6 @@
 package pl.edu.mimuw.matrix.implementations;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import pl.edu.mimuw.matrix.IDoubleMatrix;
@@ -53,10 +54,10 @@ public class CSR implements IDoubleMatrix {
     this.column = new int[this.nnz];
     this.row = new int[shape.rows + 1];
 
-    Arrays.fill(this.row, this.nnz);
-
     int valueId = 0;
     int previousRow = -1;
+
+    Arrays.fill(this.row, this.nnz);
 
     Arrays.sort(values); // O(n log(n))
 
@@ -65,8 +66,11 @@ public class CSR implements IDoubleMatrix {
         continue;
 
       if (v.row > previousRow) {
+        for (int r = previousRow + 1; r <= v.row; r++) {
+          this.row[r] = valueId;
+        }
+
         previousRow = v.row;
-        this.row[v.row] = valueId;
       }
 
       this.column[valueId] = v.column;
@@ -128,11 +132,15 @@ public class CSR implements IDoubleMatrix {
 
   @Override
   public IDoubleMatrix times(IDoubleMatrix other) {
+    assert other != null;
+
     return other.timesLeft(this);
   }
 
   @Override
   public IDoubleMatrix plus(IDoubleMatrix other) {
+    assert other != null;
+
     return other.plusLeft(this);
   }
 
@@ -263,79 +271,225 @@ public class CSR implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(Zero other) {
     assert other != null;
-    
+
     return other.plusLeft(this);
   }
 
   @Override
   public IDoubleMatrix plusLeft(CSR other) {
-    // TODO Auto-generated method stub
-    return null;
+    assert other != null;
+    assert other.shape == this.shape;
+
+    int index = 0;
+    MatrixCellValue[] values = new MatrixCellValue[this.nnz + other.nnz];
+
+    for (int r = 0; r < this.shape.rows; r++) {
+      int thisPtr = this.getRowStart(r);
+      int otherPtr = other.getRowStart(r);
+
+      while (thisPtr < this.getRowEnd(r) && otherPtr < other.getRowEnd(r)) {
+        int thisC = this.getColumn(thisPtr);
+        int otherC = other.getColumn(otherPtr);
+
+        if (thisC == otherC) {
+          values[index++] = new MatrixCellValue(r, thisC, this.getValue(thisPtr++) + other.getValue(otherPtr++));
+        } else if (thisC < otherC) {
+          values[index++] = new MatrixCellValue(r, thisC, this.getValue(thisPtr++));
+        } else {
+          values[index++] = new MatrixCellValue(r, otherC, other.getValue(otherPtr++));
+        }
+      }
+
+      // Push unmatched
+      while (thisPtr < this.getRowEnd(r)) {
+        values[index++] = new MatrixCellValue(r, this.getColumn(thisPtr), this.getValue(thisPtr));
+        thisPtr++;
+      }
+
+      while (otherPtr < other.getRowEnd(r)) {
+        values[index++] = new MatrixCellValue(r, other.getColumn(otherPtr), other.getValue(otherPtr));
+        otherPtr++;
+      }
+    }
+
+    values = Arrays.copyOf(values, index);
+
+    return new CSR(this.shape, values);
   }
 
   @Override
   public IDoubleMatrix plusLeft(Full other) {
-    // TODO Auto-generated method stub
-    return null;
+    assert other != null;
+    assert other.shape() == this.shape;
+
+    double[][] data = new double[this.shape.rows][this.shape.columns];
+    for (int i = 0; i < this.shape.rows; i++) {
+      for (int j = 0; j < this.shape.columns; j++) {
+        data[i][j] = other.get(i, j);
+      }
+
+      for (int ptr = this.getRowStart(i); ptr < this.getRowEnd(i); ptr++) {
+        data[i][this.getColumn(ptr)] += this.getValue(ptr);
+      }
+    }
+
+    return new Full(data);
+  }
+
+  private IDoubleMatrix plusLeftGeneric(IDoubleMatrix other) {
+    assert other != null;
+    assert other.shape() == this.shape;
+
+    return other.plusLeft(this);
   }
 
   @Override
   public IDoubleMatrix plusLeft(Diagonal other) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.plusLeftGeneric(other);
   }
 
   @Override
   public IDoubleMatrix plusLeft(AntiDiagonal other) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IDoubleMatrix timesLeft(Zero other) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IDoubleMatrix timesLeft(CSR other) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IDoubleMatrix timesLeft(Full other) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IDoubleMatrix timesLeft(Diagonal other) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IDoubleMatrix timesLeft(AntiDiagonal other) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IDoubleMatrix timesLeft(Vector other) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.plusLeftGeneric(other);
   }
 
   @Override
   public IDoubleMatrix plusLeft(Vector other) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.plusLeftGeneric(other);
   }
 
   @Override
   public IDoubleMatrix plusLeft(Identity other) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.plusLeftGeneric(other);
+  }
+
+  @Override
+  public IDoubleMatrix timesLeft(Zero other) {
+    assert other != null;
+    assert other.shape.columns == this.shape.rows;
+
+    return new Zero(Shape.matrix(other.shape.rows, this.shape.columns));
+  }
+
+  @Override
+  public IDoubleMatrix timesLeft(CSR other) {
+    assert other != null;
+    assert other.shape().columns == this.shape.rows;
+
+    int nnz = 0;
+
+    ArrayList<MatrixCellValue> values = new ArrayList<>();
+    MatrixCellValue[] data = new MatrixCellValue[0];
+
+    for (int r = 0; r < other.shape.rows; r++) {
+      for (int c = 0; c < this.shape.columns; c++) {
+        double sum = 0;
+
+        for (int ptr = other.getRowStart(r); ptr < other.getRowEnd(r); ptr++) {
+          sum += other.getValue(ptr) * this.get(other.getColumn(ptr), c);
+        }
+
+        if (sum != 0) {
+          nnz++;
+        }
+
+        values.add(new MatrixCellValue(r, c, sum));
+      }
+    }
+
+    Shape newShape = Shape.matrix(other.shape.rows, this.shape.columns);
+
+    if (nnz == 0) {
+      return new Zero(newShape);
+    }
+
+    return new CSR(newShape, values.toArray(data));
+  }
+
+  @Override
+  public IDoubleMatrix timesLeft(Full other) {
+    assert other != null;
+    assert other.shape().columns == this.shape.rows;
+
+    int nnz = 0;
+
+    ArrayList<MatrixCellValue> values = new ArrayList<>();
+    MatrixCellValue[] data = new MatrixCellValue[0];
+
+    for (int r = 0; r < other.shape().rows; r++) {
+      for (int c = 0; c < this.shape.columns; c++) {
+        double sum = 0;
+
+        for (int k = 0; k < other.shape().columns; k++) {
+          sum += other.get(r, k) * this.get(k, c);
+        }
+
+        if (sum != 0) {
+          nnz++;
+        }
+
+        values.add(new MatrixCellValue(r, c, sum));
+      }
+    }
+
+    Shape newShape = Shape.matrix(other.shape().rows, this.shape.columns);
+
+    if (nnz == 0) {
+      return new Zero(newShape);
+    }
+
+    return new CSR(newShape, values.toArray(data));
+  }
+
+  @Override
+  public IDoubleMatrix timesLeft(Diagonal other) {
+    assert other != null;
+    assert other.shape().columns == this.shape.rows;
+
+    int index = 0;
+    MatrixCellValue[] values = new MatrixCellValue[this.nnz];
+
+    for (int r = 0; r < other.shape().rows; r++) {
+      double scalar = other.get(r, other.indexCompliment(r));
+
+      if (scalar == 0) {
+        continue;
+      }
+
+      for (int ptr = this.getRowStart(other.indexCompliment(r)); ptr < this
+          .getRowEnd(other.indexCompliment(r)); ptr++) {
+        double value = scalar * this.getValue(ptr);
+
+        if (value != 0) {
+          values[index++] = new MatrixCellValue(r, this.getColumn(ptr), value);
+        }
+      }
+    }
+
+    Shape newShape = Shape.matrix(other.shape().rows, this.shape.columns);
+
+    if (index == 0) {
+      return new Zero(newShape);
+    }
+
+    values = Arrays.copyOf(values, index);
+
+    return new CSR(newShape, values);
+  }
+
+  @Override
+  public IDoubleMatrix timesLeft(AntiDiagonal other) {
+    assert other != null;
+    assert other.shape().columns == this.shape.rows;
+
+    return this.timesLeft((Diagonal)other);
+  }
+
+  @Override
+  public IDoubleMatrix timesLeft(Vector other) {
+    assert other != null;
+    assert other.shape().columns == this.shape.rows;
+
+    return other.timesLeft(this);
   }
 }
