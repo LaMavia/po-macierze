@@ -3,10 +3,14 @@ package pl.edu.mimuw.matrix.implementations;
 import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.Shape;
 
-public class Zero implements IDoubleMatrix {
+public class Zero extends BaseMatrix {
   final Shape shape;
 
   public Zero(Shape shape) {
+    assert shape != null;
+    assert shape.rows > 0;
+    assert shape.columns > 0;
+
     this.shape = shape;
   }
 
@@ -15,7 +19,7 @@ public class Zero implements IDoubleMatrix {
     assert other != null;
     assert this.shape.columns == other.shape().rows;
 
-    return this;
+    return new Zero(Shape.matrix(this.shape.rows, other.shape().columns));
   }
 
   @Override
@@ -25,7 +29,7 @@ public class Zero implements IDoubleMatrix {
 
   @Override
   public IDoubleMatrix plus(IDoubleMatrix other) {
-    assert this.shape == other.shape();
+    assert this.shape.equals(other.shape()) : String.format("%s != %s", this.shape, other.shape());
 
     return other;
   }
@@ -44,18 +48,6 @@ public class Zero implements IDoubleMatrix {
     }
 
     return new Full(values);
-  }
-
-  @Override
-  public IDoubleMatrix minus(IDoubleMatrix other) {
-    assert this.shape == other.shape();
-
-    return other.times(-1);
-  }
-
-  @Override
-  public IDoubleMatrix minus(double scalar) {
-    return this.plus(-scalar);
   }
 
   @Override
@@ -101,7 +93,7 @@ public class Zero implements IDoubleMatrix {
 
   private IDoubleMatrix plusLeftGeneric(IDoubleMatrix other) {
     assert other != null;
-    assert other.shape() == this.shape;
+    assert other.shape().equals(this.shape);
 
     return other;
   }

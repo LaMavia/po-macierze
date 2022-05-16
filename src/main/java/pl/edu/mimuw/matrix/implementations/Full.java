@@ -7,14 +7,20 @@ import pl.edu.mimuw.matrix.MatrixCellValue;
 import pl.edu.mimuw.matrix.Shape;
 
 // row, column
-public class Full implements IDoubleMatrix {
+public class Full extends BaseMatrix {
   private double[][] data;
   private final Shape shape;
 
   public Full(double[][] data) {
+    assert data != null;
+    assert data.length > 0;
+
     int assumedRow = data[0].length;
 
+    assert assumedRow > 0;
+
     for (double[] row : data) {
+      assert row != null;
       assert row.length == assumedRow;
     }
 
@@ -24,7 +30,7 @@ public class Full implements IDoubleMatrix {
 
   @Override
   public IDoubleMatrix plus(IDoubleMatrix other) {
-    assert this.shape() == other.shape();
+    assert this.shape().equals(other.shape());
 
     return other.plusLeft(this);
   }
@@ -104,18 +110,9 @@ public class Full implements IDoubleMatrix {
   }
 
   @Override
-  public IDoubleMatrix minus(IDoubleMatrix other) {
-    return this.plus(other.times(-1));
-  }
-
-  @Override
-  public IDoubleMatrix minus(double scalar) {
-    return this.plus(-scalar);
-  }
-
-  @Override
   public double get(int row, int column) {
-    assert (0 <= row && row < shape.rows) && (0 <= column && column < shape.columns);
+    assert (0 <= row && row < shape.rows);
+    assert (0 <= column && column < shape.columns);
 
     return data[row][column];
   }
@@ -185,14 +182,14 @@ public class Full implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(Full other) {
     assert other != null;
-    assert other.shape == this.shape;
+    assert other.shape.equals(this.shape);
 
     int nnz = 0;
     double[][] data = new double[this.shape.rows][this.shape.columns];
 
     for (int i = 0; i < this.shape.rows; i++) {
       for (int j = 0; j < this.shape.columns; j++) {
-        data[i][j] = this.get(i, j) * other.get(i, j);
+        data[i][j] = this.get(i, j) + other.get(i, j);
 
         if (data[i][j] != 0) {
           nnz++;
@@ -248,7 +245,7 @@ public class Full implements IDoubleMatrix {
         double sum = 0;
 
         for (int ptr = other.getRowStart(r); ptr < other.getRowEnd(r); ptr++) {
-          sum += other.getValue(ptr) * this.get(r, other.getColumn(ptr));
+          sum += other.getValue(ptr) * this.get(other.getColumn(ptr), c);
         }
 
         if (sum != 0) {
@@ -278,7 +275,7 @@ public class Full implements IDoubleMatrix {
         double sum = 0;
 
         for (int k = 0; k < this.shape.rows; k++) {
-          sum += this.get(r, k) * other.get(k, c);
+          sum += other.get(r, k) * this.get(k, c);
         }
 
         data[r][c] = sum;

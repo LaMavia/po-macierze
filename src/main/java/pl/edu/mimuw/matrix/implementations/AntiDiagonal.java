@@ -55,7 +55,7 @@ public class AntiDiagonal extends Diagonal {
   @Override
   public IDoubleMatrix plusLeft(AntiDiagonal other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     double[] values = new double[this.size()];
 

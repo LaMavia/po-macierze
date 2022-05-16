@@ -5,7 +5,7 @@ import java.util.Arrays;
 import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.Shape;
 
-public class Vector implements IDoubleMatrix {
+public class Vector extends BaseMatrix {
   private int[] index;
   private double[] value;
 
@@ -22,6 +22,8 @@ public class Vector implements IDoubleMatrix {
   }
 
   public Vector(double... values) {
+    assert values != null;
+
     int nnz = this.countNNZ(values);
     this.value = new double[nnz + 1];
     this.index = new int[nnz + 1];
@@ -171,21 +173,21 @@ public class Vector implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(Identity other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     return new Vector(this.value[0] + 1);
   }
 
   @Override
   public IDoubleMatrix plusLeft(Zero other) {
-    assert this.shape() == other.shape();
+    assert this.shape().equals(other.shape());
 
     return this;
   }
 
   @Override
   public IDoubleMatrix plusLeft(CSR other) {
-    assert this.shape() == other.shape();
+    assert this.shape().equals(other.shape());
 
     double[] newData = new double[this.numberOfRows()];
 
@@ -206,7 +208,7 @@ public class Vector implements IDoubleMatrix {
 
   @Override
   public IDoubleMatrix plusLeft(Full other) {
-    assert this.shape() == other.shape();
+    assert this.shape().equals(other.shape());
 
     double[] newData = new double[this.numberOfRows()];
     double[][] oldData = other.data();
@@ -228,7 +230,7 @@ public class Vector implements IDoubleMatrix {
 
   @Override
   public IDoubleMatrix plusLeft(Diagonal other) {
-    assert this.shape() == other.shape();
+    assert this.shape().equals(other.shape());
 
     double vThis = this.value[0];
     double vOther = other.get(0, 0);
@@ -242,7 +244,7 @@ public class Vector implements IDoubleMatrix {
 
   @Override
   public IDoubleMatrix plusLeft(AntiDiagonal other) {
-    assert this.shape() == other.shape();
+    assert this.shape().equals(other.shape());
 
     // => [_] + [_]
     double vThis = this.value[0];
@@ -276,16 +278,6 @@ public class Vector implements IDoubleMatrix {
     }
 
     return new Vector(data);
-  }
-
-  @Override
-  public IDoubleMatrix minus(IDoubleMatrix other) {
-    return this.plus(other.times(-1));
-  }
-
-  @Override
-  public IDoubleMatrix minus(double scalar) {
-    return this.plus(-scalar);
   }
 
   @Override
@@ -331,7 +323,7 @@ public class Vector implements IDoubleMatrix {
     double max = 0;
 
     for (double v : this.value) {
-      max = Math.max(max, v);
+      max = Math.max(max, Math.abs(v));
     }
 
     return max;

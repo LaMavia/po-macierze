@@ -6,7 +6,7 @@ import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.MatrixCellValue;
 import pl.edu.mimuw.matrix.Shape;
 
-public class Identity implements IDoubleMatrix {
+public class Identity extends BaseMatrix {
   private final int size;
 
   public Identity(int size) {
@@ -25,11 +25,11 @@ public class Identity implements IDoubleMatrix {
   @Override
   public IDoubleMatrix times(double scalar) {
     if (Math.abs(scalar) == 0) {
-      return new Zero(Shape.matrix(this.size, this.size));
+      return new Zero(this.shape());
     }
 
     if (scalar == 1) {
-      return new Identity(size);
+      return this;
     }
 
     double[] values = new double[this.size];
@@ -44,7 +44,7 @@ public class Identity implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plus(IDoubleMatrix other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     return other.plusLeft(this);
   }
@@ -64,16 +64,6 @@ public class Identity implements IDoubleMatrix {
     }
 
     return new Full(values);
-  }
-
-  @Override
-  public IDoubleMatrix minus(IDoubleMatrix other) {
-    return this.plus(other.times(-1));
-  }
-
-  @Override
-  public IDoubleMatrix minus(double scalar) {
-    return this.plus(-scalar);
   }
 
   @Override
@@ -118,7 +108,7 @@ public class Identity implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(Zero other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     return this;
   }
@@ -126,7 +116,7 @@ public class Identity implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(CSR other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     int index = 0;
     MatrixCellValue[] values = new MatrixCellValue[other.nnz + 1 + this.size];
@@ -158,7 +148,7 @@ public class Identity implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(Full other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     double[][] values = new double[this.size][this.size];
 
@@ -174,7 +164,7 @@ public class Identity implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(Diagonal other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     double[] values = new double[this.size];
     int nz = 0;
@@ -194,7 +184,7 @@ public class Identity implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(AntiDiagonal other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     MatrixCellValue[] values = new MatrixCellValue[this.size * 2];
     int index = 0;
@@ -216,7 +206,7 @@ public class Identity implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(Vector other) {
     assert other != null;
-    assert other.shape() == this.shape(); // => size = 1
+    assert other.shape().equals(this.shape()); // => size = 1
 
     return new Vector(1 + other.get(0, 0));
   }
@@ -224,7 +214,7 @@ public class Identity implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(Identity other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     double[] values = new double[this.size];
 

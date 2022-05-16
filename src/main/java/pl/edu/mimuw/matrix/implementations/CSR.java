@@ -15,6 +15,8 @@ public class CSR implements IDoubleMatrix {
   private final Shape shape;
 
   private int countNNZ(MatrixCellValue[] values) {
+    assert values != null;
+    
     int nnz = 0;
 
     for (MatrixCellValue v : values) {
@@ -121,7 +123,7 @@ public class CSR implements IDoubleMatrix {
       return this;
     }
 
-    double[] valueNew = new double[this.value.length];
+    double[] valueNew = this.value.clone();
 
     for (int i = 0; i < valueNew.length; i++) {
       valueNew[i] *= scalar;
@@ -160,7 +162,7 @@ public class CSR implements IDoubleMatrix {
 
   @Override
   public IDoubleMatrix minus(IDoubleMatrix other) {
-    return other.plus(this.times(-1.0));
+    return this.plus(other.times(-1.0));
   }
 
   @Override
@@ -259,8 +261,13 @@ public class CSR implements IDoubleMatrix {
 
   @Override
   public double frobeniusNorm() {
-    // TODO Auto-generated method stub
-    return 0;
+    double sum = 0;
+
+    for (double v : this.value) {
+      sum += v*v;
+    }
+
+    return Math.sqrt(sum);
   }
 
   @Override
@@ -278,7 +285,7 @@ public class CSR implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(CSR other) {
     assert other != null;
-    assert other.shape == this.shape;
+    assert other.shape.equals(this.shape);
 
     int index = 0;
     MatrixCellValue[] values = new MatrixCellValue[this.nnz + other.nnz];
@@ -320,7 +327,7 @@ public class CSR implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(Full other) {
     assert other != null;
-    assert other.shape() == this.shape;
+    assert other.shape().equals(this.shape);
 
     double[][] data = new double[this.shape.rows][this.shape.columns];
     for (int i = 0; i < this.shape.rows; i++) {
@@ -338,7 +345,7 @@ public class CSR implements IDoubleMatrix {
 
   private IDoubleMatrix plusLeftGeneric(IDoubleMatrix other) {
     assert other != null;
-    assert other.shape() == this.shape;
+    assert other.shape().equals(this.shape);
 
     return other.plusLeft(this);
   }

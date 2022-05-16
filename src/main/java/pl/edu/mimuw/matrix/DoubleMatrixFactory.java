@@ -1,35 +1,43 @@
 package pl.edu.mimuw.matrix;
 
+import pl.edu.mimuw.matrix.implementations.AntiDiagonal;
+import pl.edu.mimuw.matrix.implementations.CSR;
+import pl.edu.mimuw.matrix.implementations.Diagonal;
+import pl.edu.mimuw.matrix.implementations.Full;
+import pl.edu.mimuw.matrix.implementations.Identity;
+import pl.edu.mimuw.matrix.implementations.Vector;
+import pl.edu.mimuw.matrix.implementations.Zero;
+
 public class DoubleMatrixFactory {
 
   private DoubleMatrixFactory() {
   }
 
   public static IDoubleMatrix sparse(Shape shape, MatrixCellValue... values) {
-    return null; // CSR
+    return new CSR(shape, values);
   }
 
   public static IDoubleMatrix full(double[][] values) {
-    return null; // 2D array
+    return new Full(values);
   }
 
   public static IDoubleMatrix identity(int size) {
-    return null; // (anti-/)diagonal conditions -> [1] | [0]
+    return new Identity(size);
   }
 
   public static IDoubleMatrix diagonal(double... diagonalValues) {
-    return null; // Array of values, [(i, i)] -> [i], [(i, j)] -> [0]
+    return new Diagonal(diagonalValues);
   }
 
   public static IDoubleMatrix antiDiagonal(double... antiDiagonalValues) {
-    return null; // Array of values, [(i, N-i)] -> [i], [(i, j)] -> [0]
+    return new AntiDiagonal(antiDiagonalValues);
   }
 
   public static IDoubleMatrix vector(double... values) {
-    return null; // Array of values, [(i, 0)] -> [i], [(i, j)] -> [0]
+    return new Vector(values);
   }
 
   public static IDoubleMatrix zero(Shape shape) {
-    return null; // nada
+    return new Zero(shape);
   }
 }

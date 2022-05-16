@@ -6,10 +6,12 @@ import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.MatrixCellValue;
 import pl.edu.mimuw.matrix.Shape;
 
-public class Diagonal implements IDoubleMatrix {
+public class Diagonal extends BaseMatrix {
   protected double[] values;
 
   public Diagonal(double... values) {
+    assert values != null;
+
     this.values = values;
   }
 
@@ -44,7 +46,7 @@ public class Diagonal implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plus(IDoubleMatrix other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     return other.plusLeft(this);
   }
@@ -60,16 +62,6 @@ public class Diagonal implements IDoubleMatrix {
     }
 
     return new Full(values);
-  }
-
-  @Override
-  public IDoubleMatrix minus(IDoubleMatrix other) {
-    return this.plus(other.times(-1));
-  }
-
-  @Override
-  public IDoubleMatrix minus(double scalar) {
-    return this.plus(-scalar);
   }
 
   @Override
@@ -122,7 +114,7 @@ public class Diagonal implements IDoubleMatrix {
     double sum = 0;
 
     for (double v : this.values) {
-      sum += Math.abs(v);
+      sum += v*v;
     }
 
     return Math.sqrt(sum);
@@ -136,7 +128,7 @@ public class Diagonal implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(Zero other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     return this;
   }
@@ -144,7 +136,7 @@ public class Diagonal implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(CSR other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     int index = 0;
     MatrixCellValue[] values = new MatrixCellValue[other.nnz + 1 + this.size()];
@@ -176,7 +168,7 @@ public class Diagonal implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(Full other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     double[][] values = new double[this.size()][this.size()];
 
@@ -192,7 +184,7 @@ public class Diagonal implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(Diagonal other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     double[] values = new double[this.size()];
 
@@ -206,7 +198,7 @@ public class Diagonal implements IDoubleMatrix {
   @Override
   public IDoubleMatrix plusLeft(AntiDiagonal other) {
     assert other != null;
-    assert other.shape() == this.shape();
+    assert other.shape().equals(this.shape());
 
     MatrixCellValue[] values = new MatrixCellValue[this.size() * 2];
     int index = 0;
