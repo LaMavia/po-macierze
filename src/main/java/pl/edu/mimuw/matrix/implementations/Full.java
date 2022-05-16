@@ -1,6 +1,9 @@
 package pl.edu.mimuw.matrix.implementations;
 
+import java.util.ArrayList;
+
 import pl.edu.mimuw.matrix.IDoubleMatrix;
+import pl.edu.mimuw.matrix.MatrixCellValue;
 import pl.edu.mimuw.matrix.Shape;
 
 // row, column
@@ -19,15 +22,37 @@ public class Full implements IDoubleMatrix {
     this.shape = Shape.matrix(this.data.length, this.data[0].length);
   }
 
-  public IDoubleMatrix plusLeft(Zero other) {
-    return this;
-  }
-
   @Override
   public IDoubleMatrix plus(IDoubleMatrix other) {
     assert this.shape() == other.shape();
 
     return other.plusLeft(this);
+  }
+
+  @Override
+  public IDoubleMatrix plus(double scalar) {
+    if (scalar == 0) {
+      return this;
+    }
+
+    int nnz = 0;
+    double[][] data = new double[this.shape.rows][this.shape.columns];
+
+    for (int i = 0; i < this.shape.rows; i++) {
+      for (int j = 0; j < this.shape.columns; j++) {
+        data[i][j] = this.get(i, j) + scalar;
+
+        if (data[i][j] != 0) {
+          nnz++;
+        }
+      }
+    }
+
+    if (nnz == 0) {
+      return new Zero(this.shape);
+    }
+
+    return new Full(data);
   }
 
   @Override
@@ -39,26 +64,53 @@ public class Full implements IDoubleMatrix {
 
   @Override
   public IDoubleMatrix times(double scalar) {
-    // TODO Auto-generated method stub
-    return null;
+    if (scalar == 1) {
+      return this;
+    }
+
+    if (scalar == 0) {
+      return new Zero(this.shape);
+    }
+
+    int nnz = 0;
+    double[][] data = new double[this.shape.rows][this.shape.columns];
+
+    for (int i = 0; i < this.shape.rows; i++) {
+      for (int j = 0; j < this.shape.columns; j++) {
+        data[i][j] = this.get(i, j) * scalar;
+
+        if (data[i][j] != 0) {
+          nnz++;
+        }
+      }
+    }
+
+    if (nnz == 0) {
+      return new Zero(this.shape);
+    }
+
+    return new Full(data);
+  }
+
+  private IDoubleMatrix plusLeftGeneric(IDoubleMatrix other) {
+    assert other != null;
+
+    return other.plusLeft(this);
   }
 
   @Override
-  public IDoubleMatrix plus(double scalar) {
-    // TODO Auto-generated method stub
-    return null;
+  public IDoubleMatrix plusLeft(Zero other) {
+    return this.plusLeftGeneric(other);
   }
 
   @Override
   public IDoubleMatrix minus(IDoubleMatrix other) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.plus(other.times(-1));
   }
 
   @Override
   public IDoubleMatrix minus(double scalar) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.plus(-scalar);
   }
 
   @Override
@@ -70,25 +122,54 @@ public class Full implements IDoubleMatrix {
 
   @Override
   public double[][] data() {
-    return data;
+    return this.data;
   }
 
   @Override
   public double normOne() {
-    // TODO Auto-generated method stub
-    return 0;
+    double max = 0;
+
+    for (int c = 0; c < this.shape.columns; c++) {
+      double sum = 0;
+
+      for (int r = 0; r < this.shape.rows; r++) {
+        sum += Math.abs(this.get(r, c));
+      }
+
+      max = Math.max(sum, max);
+    }
+
+    return max;
   }
 
   @Override
   public double normInfinity() {
-    // TODO Auto-generated method stub
-    return 0;
+    double max = 0;
+
+    for (int r = 0; r < this.shape.rows; r++) {
+      double sum = 0;
+
+      for (int c = 0; c < this.shape.columns; c++) {
+        sum += Math.abs(this.get(r, c));
+      }
+
+      max = Math.max(sum, max);
+    }
+
+    return max;
   }
 
   @Override
   public double frobeniusNorm() {
-    // TODO Auto-generated method stub
-    return 0;
+    double sum = 0;
+
+    for (int r = 0; r < this.shape.rows; r++) {
+      for (int c = 0; c < this.shape.columns; c++) {
+        sum += Math.abs(Math.pow(this.get(r, c), 2));
+      }
+    }
+
+    return Math.sqrt(sum);
   }
 
   @Override
@@ -98,73 +179,164 @@ public class Full implements IDoubleMatrix {
 
   @Override
   public IDoubleMatrix plusLeft(CSR other) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.plusLeftGeneric(other);
   }
 
   @Override
   public IDoubleMatrix plusLeft(Full other) {
-    // TODO Auto-generated method stub
-    return null;
+    assert other != null;
+    assert other.shape == this.shape;
+
+    int nnz = 0;
+    double[][] data = new double[this.shape.rows][this.shape.columns];
+
+    for (int i = 0; i < this.shape.rows; i++) {
+      for (int j = 0; j < this.shape.columns; j++) {
+        data[i][j] = this.get(i, j) * other.get(i, j);
+
+        if (data[i][j] != 0) {
+          nnz++;
+        }
+      }
+    }
+
+    if (nnz == 0) {
+      return new Zero(this.shape);
+    }
+
+    return new Full(data);
   }
 
   @Override
   public IDoubleMatrix plusLeft(Diagonal other) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.plusLeftGeneric(other);
   }
 
   @Override
   public IDoubleMatrix plusLeft(AntiDiagonal other) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IDoubleMatrix timesLeft(Zero other) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IDoubleMatrix timesLeft(CSR other) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IDoubleMatrix timesLeft(Full other) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IDoubleMatrix timesLeft(Diagonal other) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IDoubleMatrix timesLeft(AntiDiagonal other) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public IDoubleMatrix timesLeft(Vector other) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.plusLeftGeneric(other);
   }
 
   @Override
   public IDoubleMatrix plusLeft(Vector other) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.plusLeftGeneric(other);
   }
 
   @Override
   public IDoubleMatrix plusLeft(Identity other) {
-    // TODO Auto-generated method stub
-    return null;
+    return this.plusLeftGeneric(other);
+  }
+
+  @Override
+  public IDoubleMatrix timesLeft(Zero other) {
+    assert other != null;
+    assert other.shape.columns == this.shape.rows;
+
+    return new Zero(Shape.matrix(other.shape.rows, this.shape.columns));
+  }
+
+  @Override
+  public IDoubleMatrix timesLeft(CSR other) {
+    assert other != null;
+    assert other.shape().columns == this.shape.rows;
+
+    ArrayList<MatrixCellValue> values = new ArrayList<>();
+    MatrixCellValue[] data = new MatrixCellValue[0];
+
+    for (int r = 0; r < other.shape().rows; r++) {
+      for (int c = 0; c < this.shape.columns; c++) {
+        double sum = 0;
+
+        for (int ptr = other.getRowStart(r); ptr < other.getRowEnd(r); ptr++) {
+          sum += other.getValue(ptr) * this.get(r, other.getColumn(ptr));
+        }
+
+        if (sum != 0) {
+          values.add(new MatrixCellValue(r, c, sum));
+        }
+      }
+    }
+
+    Shape newShape = Shape.matrix(other.shape().rows, this.shape.columns);
+
+    if (values.size() == 0) {
+      return new Zero(newShape);
+    }
+
+    return new CSR(newShape, values.toArray(data));
+  }
+
+  @Override
+  public IDoubleMatrix timesLeft(Full other) {
+    assert other != null;
+    assert other.shape().columns == this.shape.rows;
+
+    double[][] data = new double[other.shape.rows][this.shape.columns];
+
+    for (int r = 0; r < other.shape.rows; r++) {
+      for (int c = 0; c < this.shape.columns; c++) {
+        double sum = 0;
+
+        for (int k = 0; k < this.shape.rows; k++) {
+          sum += this.get(r, k) * other.get(k, c);
+        }
+
+        data[r][c] = sum;
+      }
+    }
+
+    return new Full(data);
+  }
+
+  @Override
+  public IDoubleMatrix timesLeft(Diagonal other) {
+    assert other != null;
+    assert other.shape().columns == this.shape.rows;
+
+    double[][] data = new double[other.shape().rows][this.shape.columns];
+
+    for (int r = 0; r < other.shape().rows; r++) {
+      double scalar = other.get(r, other.indexCompliment(r));
+
+      if (scalar == 0) {
+        continue;
+      }
+
+      for (int c = 0; c < this.shape.columns; c++) {
+        data[r][c] = scalar * this.get(other.indexCompliment(r), c);
+      }
+    }
+
+    return new Full(data);
+  }
+
+  @Override
+  public IDoubleMatrix timesLeft(AntiDiagonal other) {
+    assert other != null;
+    assert other.shape().columns == this.shape.rows;
+
+    return this.timesLeft((Diagonal) other);
+  }
+
+  @Override
+  public IDoubleMatrix timesLeft(Vector other) {
+    assert other != null;
+    assert other.shape().columns == this.shape.rows;
+
+    double[][] data = new double[other.shape().rows][this.shape.columns];
+
+    for (int r = 0; r < other.shape().rows; r++) {
+      double scalar = other.get(r, 0);
+
+      if (scalar == 0) {
+        continue;
+      }
+
+      for (int c = 0; c < this.shape.columns; c++) {
+        data[r][c] = scalar * this.get(r, c);
+      }
+    }
+
+    return new Full(data);
   }
 }

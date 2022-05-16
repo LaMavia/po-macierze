@@ -411,8 +411,6 @@ public class CSR implements IDoubleMatrix {
     assert other != null;
     assert other.shape().columns == this.shape.rows;
 
-    int nnz = 0;
-
     ArrayList<MatrixCellValue> values = new ArrayList<>();
     MatrixCellValue[] data = new MatrixCellValue[0];
 
@@ -425,16 +423,15 @@ public class CSR implements IDoubleMatrix {
         }
 
         if (sum != 0) {
-          nnz++;
+          values.add(new MatrixCellValue(r, c, sum));
         }
 
-        values.add(new MatrixCellValue(r, c, sum));
       }
     }
 
     Shape newShape = Shape.matrix(other.shape().rows, this.shape.columns);
 
-    if (nnz == 0) {
+    if (values.size() == 0) {
       return new Zero(newShape);
     }
 
@@ -482,7 +479,7 @@ public class CSR implements IDoubleMatrix {
     assert other != null;
     assert other.shape().columns == this.shape.rows;
 
-    return this.timesLeft((Diagonal)other);
+    return this.timesLeft((Diagonal) other);
   }
 
   @Override
@@ -490,6 +487,31 @@ public class CSR implements IDoubleMatrix {
     assert other != null;
     assert other.shape().columns == this.shape.rows;
 
-    return other.timesLeft(this);
+    int index = 0;
+    MatrixCellValue[] values = new MatrixCellValue[this.nnz * other.numberOfRows()];
+
+    for (int r = 0; r < other.numberOfRows(); r++) {
+      double scalar = other.get(r, 0);
+
+      if (scalar == 0) {
+        continue;
+      }
+
+      for (int ptr = this.getRowStart(r); ptr < this.getRowEnd(r); ptr++) {
+        double value = scalar * this.getValue(ptr);
+
+        if (value != 0) {
+          values[index++] = new MatrixCellValue(r, this.getColumn(ptr), value);
+        }
+      }
+    }
+
+    Shape newShape = Shape.matrix(other.numberOfRows(), this.shape.columns);
+
+    if (index == 0) {
+      return new Zero(newShape);
+    }
+
+    return new CSR(newShape, Arrays.copyOf(values, index));
   }
 }
