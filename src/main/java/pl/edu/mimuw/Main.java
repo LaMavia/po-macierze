@@ -28,24 +28,31 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    final IDoubleMatrix SPARSE_2X3 = sparse(matrix(2, 3),
-        cell(0, 0, 1),
-        cell(0, 1, 2),
-        cell(0, 2, 3),
-        cell(1, 0, 4),
-        cell(1, 1, 5),
-        cell(1, 2, 6));
+    final var l = DoubleMatrixFactory.sparse(
+        matrix(1_000_000, 1_000_000_000),
+        cell(0, 0, 3),
+        cell(0, 213, 2),
+        cell(0, 555_555, 66),
 
-    final IDoubleMatrix FULL_3X2 = full(new double[][] {
-        new double[] { 1, 2 },
-        new double[] { 3, 4 },
-        new double[] { 5, 6 }
-    });
+        cell(456_456, 1, 7),
+        cell(456_456, 321, 8),
+        cell(456_456, 444_444, 66)
 
-  printMatrix(SPARSE_2X3);
-  printMatrix(FULL_3X2);
+    );
+    final var r = DoubleMatrixFactory.sparse(
+        matrix(1_000_000_000, 1_000_000),
+        cell(0, 0, 4),
+        cell(213, 0, 5),
+        cell(666_666, 0, 66),
 
-  printMatrix(SPARSE_2X3.times(FULL_3X2));    
+        cell(1, 456_456, 9),
+        cell(321, 456_456, 10),
+        cell(444_445, 456_456, 66));
+    final var result = l.times(r);
+
+    System.out.println(result);
+
+    // printMatrix(SPARSE_2X3.times(FULL_3X2));
 
     // Tu trzeba wpisać kod testujący toString dla poszczególnych macierzy i
     // wyników

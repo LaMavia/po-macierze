@@ -9,14 +9,36 @@ import pl.edu.mimuw.matrix.Shape;
 
 public class CSR implements IDoubleMatrix {
   public final int nnz;
+  public final int ner;
   private final double[] value;
   private final int[] column;
   private final int[] row;
+  private final int[] rowPointer;
   private final Shape shape;
+
+  private int countNER(MatrixCellValue[] values) {
+    assert values != null;
+
+    if (values.length == 0) {
+      return 0;
+    }
+
+    int previousRow = values[0].row;
+    int ner = 1;
+
+    for (MatrixCellValue v : values) {
+      if (v.row != previousRow) {
+        ner++;
+        previousRow = v.row;
+      }
+    }
+
+    return ner;
+  }
 
   private int countNNZ(MatrixCellValue[] values) {
     assert values != null;
-    
+
     int nnz = 0;
 
     for (MatrixCellValue v : values) {
@@ -28,49 +50,61 @@ public class CSR implements IDoubleMatrix {
   }
 
   private void assertInputValidity(Shape shape, MatrixCellValue... values) {
+    assert shape != null;
+    assert values != null;
+    assert values.length > 0;
+
     for (MatrixCellValue v : values) {
-      assert (0 <= v.row && v.row < shape.rows) && (0 <= v.column && v.column < shape.columns);
+      assert (0 <= v.row && v.row < shape.rows);
+      assert (0 <= v.column && v.column < shape.columns);
     }
   }
 
   private CSR(
       double[] value,
+      int[] rowPointer,
       int[] column,
       int[] row,
       Shape shape) {
     this.nnz = value.length;
+    this.ner = row.length - 1;
 
     this.value = value;
     this.column = column;
     this.row = row;
+    this.rowPointer = rowPointer;
     this.shape = shape;
   }
 
   public CSR(Shape shape, MatrixCellValue... values) {
     assertInputValidity(shape, values);
 
+    Arrays.sort(values); // O(n log(n))
+
     this.shape = shape;
     this.nnz = countNNZ(values); // O(n)
+    this.ner = countNER(values);
 
     this.value = new double[this.nnz];
     this.column = new int[this.nnz];
-    this.row = new int[shape.rows + 1];
+    this.row = new int[this.ner + 1];
+    this.rowPointer = new int[this.ner + 1];
 
     int valueId = 0;
+    int rowIndex = 0;
     int previousRow = -1;
 
-    Arrays.fill(this.row, this.nnz);
-
-    Arrays.sort(values); // O(n log(n))
+    this.row[this.ner] = this.nnz;
+    this.rowPointer[this.ner] = this.shape.rows;
 
     for (MatrixCellValue v : values) {
       if (v.value == 0)
         continue;
 
       if (v.row > previousRow) {
-        for (int r = previousRow + 1; r <= v.row; r++) {
-          this.row[r] = valueId;
-        }
+        this.rowPointer[rowIndex] = v.row;
+        this.row[rowIndex] = valueId;
+        rowIndex++;
 
         previousRow = v.row;
       }
@@ -82,14 +116,38 @@ public class CSR implements IDoubleMatrix {
     }
   }
 
+  public int getRowPointer(int r) {
+    assert 0 <= r && r < this.shape.rows : String.format("%d/%d", r, this.shape.rows);
+
+    int i = 0;
+
+    for (; i < this.ner && this.rowPointer[i] <= r; i++) {
+      if (this.rowPointer[i] == r) {
+        return i;
+      }
+    }
+
+    return this.ner;
+  }
+
+  public int getRowNumber(int i) {
+    assert 0 <= i && i < this.ner;
+
+    return this.rowPointer[i];
+  }
+
   public int getRowStart(int i) {
-    assert 0 <= i && i < this.row.length - 1;
+    assert 0 <= i && i <= this.ner : String.format("%d/%d", i, this.ner);
 
     return this.row[i];
   }
 
   public int getRowEnd(int i) {
-    assert 0 <= i && i < this.row.length - 1;
+    assert 0 <= i && i <= this.ner;
+
+    if (i == this.ner) {
+      return this.row[this.ner];
+    }
 
     return this.row[i + 1];
   }
@@ -108,7 +166,8 @@ public class CSR implements IDoubleMatrix {
 
   @Override
   public String toString() {
-    return String.format("row:\n%s\ncolumn:\n%s\nvalue:\n%s\n",
+    return String.format("ner:\n%s\nrow:\n%s\ncolumn:\n%s\nvalue:\n%s\n",
+        Arrays.toString(this.rowPointer),
         Arrays.toString(this.row),
         Arrays.toString(this.column),
         Arrays.toString(this.value));
@@ -129,7 +188,7 @@ public class CSR implements IDoubleMatrix {
       valueNew[i] *= scalar;
     }
 
-    return new CSR(valueNew, column, row, shape);
+    return new CSR(valueNew, this.rowPointer, column, row, shape);
   }
 
   @Override
@@ -184,9 +243,12 @@ public class CSR implements IDoubleMatrix {
     assert 0 <= row && row < this.shape.rows;
     assert 0 <= column && column < this.shape.columns;
 
-    for (int i = this.row[row]; i < this.row[row + 1]; i++) {
-      if (this.column[i] == column) {
-        return this.value[i];
+    int start = this.getRowStart(this.getRowPointer(row));
+    int end = this.getRowEnd(this.getRowPointer(row));
+
+    for (int ptr = start; ptr < end; ptr++) {
+      if (this.getColumn(ptr) == column) {
+        return this.getValue(ptr);
       }
     }
 
@@ -198,17 +260,26 @@ public class CSR implements IDoubleMatrix {
     double[][] data = new double[this.shape.rows][this.shape.columns];
 
     for (int i = 0; i < this.shape.rows; i++) {
-      int rowPtr = this.row[i];
-      int rowPtrEnd = this.row[i + 1];
-
       for (int j = 0; j < this.shape.columns; j++) {
-        if (rowPtr < rowPtrEnd && this.column[rowPtr] == j) {
-          data[i][j] = this.value[rowPtr++];
-        } else {
-          data[i][j] = 0.0;
-        }
+        data[i][j] = this.get(i, j);
       }
     }
+
+    /*
+     * 
+     * for (int i = 0; i < this.shape.rows; i++) {
+     * int rowPtr = this.row[i];
+     * int rowPtrEnd = this.row[i + 1];
+     * 
+     * for (int j = 0; j < this.shape.columns; j++) {
+     * if (rowPtr < rowPtrEnd && this.column[rowPtr] == j) {
+     * data[i][j] = this.value[rowPtr++];
+     * } else {
+     * data[i][j] = 0.0;
+     * }
+     * }
+     * }
+     */
 
     return data;
   }
@@ -218,16 +289,24 @@ public class CSR implements IDoubleMatrix {
     // Calculate column sums
     double[] columnSums = new double[this.shape.columns];
 
-    for (int i = 0; i < this.shape.rows; i++) {
-      int rowPtr = this.row[i];
-      int rowPtrEnd = this.row[i + 1];
-
-      while (rowPtr < rowPtrEnd) {
-        columnSums[this.column[rowPtr]] += Math.abs(this.value[rowPtr]);
-
-        rowPtr++;
+    for (int ri = 0; ri < this.ner; ri++) {
+      for (int ptr = this.getRowStart(ri); ptr < this.getRowEnd(ri); ptr++) {
+        columnSums[this.getColumn(ptr)] += Math.abs(this.getValue(ptr));
       }
     }
+
+    /*
+     * for (int i = 0; i < this.shape.rows; i++) {
+     * int rowPtr = this.row[i];
+     * int rowPtrEnd = this.row[i + 1];
+     * 
+     * while (rowPtr < rowPtrEnd) {
+     * columnSums[this.column[rowPtr]] += Math.abs(this.value[rowPtr]);
+     * 
+     * rowPtr++;
+     * }
+     * }
+     */
 
     // Pick the max
     double maxColumnSum = -1;
@@ -241,16 +320,16 @@ public class CSR implements IDoubleMatrix {
 
   @Override
   public double normInfinity() {
-    double maxRowSum = -1;
+    double maxRowSum = 0;
 
-    for (int i = 0; i < this.shape.rows; i++) {
-      int rowPtr = this.row[i];
-      int rowPtrEnd = this.row[i + 1];
+    for (int i = 0; i < this.ner; i++) {
+      int rowPtr = this.getRowStart(i);
+      int rowPtrEnd = this.getRowEnd(i);
 
       double rowSum = 0;
 
       while (rowPtr < rowPtrEnd) {
-        rowSum += Math.abs(this.value[rowPtr++]);
+        rowSum += Math.abs(this.getValue(rowPtr++));
       }
 
       maxRowSum = Math.max(maxRowSum, rowSum);
@@ -264,7 +343,7 @@ public class CSR implements IDoubleMatrix {
     double sum = 0;
 
     for (double v : this.value) {
-      sum += v*v;
+      sum += v * v;
     }
 
     return Math.sqrt(sum);
@@ -290,31 +369,71 @@ public class CSR implements IDoubleMatrix {
     int index = 0;
     MatrixCellValue[] values = new MatrixCellValue[this.nnz + other.nnz];
 
-    for (int r = 0; r < this.shape.rows; r++) {
-      int thisPtr = this.getRowStart(r);
-      int otherPtr = other.getRowStart(r);
+    int thisRi = 0;
+    int otherRi = 0;
 
-      while (thisPtr < this.getRowEnd(r) && otherPtr < other.getRowEnd(r)) {
-        int thisC = this.getColumn(thisPtr);
-        int otherC = other.getColumn(otherPtr);
+    while (thisRi < this.ner && otherRi < other.ner) {
+      if (this.getRowNumber(thisRi) == other.getRowNumber(otherRi)) {
+        int r = this.getRowNumber(thisRi);
 
-        if (thisC == otherC) {
-          values[index++] = new MatrixCellValue(r, thisC, this.getValue(thisPtr++) + other.getValue(otherPtr++));
-        } else if (thisC < otherC) {
-          values[index++] = new MatrixCellValue(r, thisC, this.getValue(thisPtr++));
-        } else {
-          values[index++] = new MatrixCellValue(r, otherC, other.getValue(otherPtr++));
+        int thisPtr = this.getRowStart(thisRi);
+        int otherPtr = other.getRowStart(otherRi);
+
+        while (thisPtr < this.getRowEnd(thisRi) && otherPtr < other.getRowEnd(otherRi)) {
+          int thisC = this.getColumn(thisPtr);
+          int otherC = other.getColumn(otherPtr);
+
+          if (thisC == otherC) {
+            values[index++] = new MatrixCellValue(r, thisC, this.getValue(thisPtr++) + other.getValue(otherPtr++));
+          } else if (thisC < otherC) {
+            values[index++] = new MatrixCellValue(r, thisC, this.getValue(thisPtr++));
+          } else {
+            values[index++] = new MatrixCellValue(r, otherC, other.getValue(otherPtr++));
+          }
         }
-      }
 
-      // Push unmatched
-      while (thisPtr < this.getRowEnd(r)) {
-        values[index++] = new MatrixCellValue(r, this.getColumn(thisPtr), this.getValue(thisPtr));
-        thisPtr++;
-      }
+        // Push unmatched
+        while (thisPtr < this.getRowEnd(thisRi)) {
+          values[index++] = new MatrixCellValue(r, this.getColumn(thisPtr), this.getValue(thisPtr));
+          thisPtr++;
+        }
 
-      while (otherPtr < other.getRowEnd(r)) {
-        values[index++] = new MatrixCellValue(r, other.getColumn(otherPtr), other.getValue(otherPtr));
+        while (otherPtr < other.getRowEnd(otherRi)) {
+          values[index++] = new MatrixCellValue(r, other.getColumn(otherPtr), other.getValue(otherPtr));
+          otherPtr++;
+        }
+
+        thisRi++;
+        otherRi++;
+      } else if (this.getRowNumber(thisRi) < other.getRowNumber(otherRi)) {
+        for (int thisPtr = this.getRowStart(thisRi); thisPtr < this.getRowEnd(thisRi); thisPtr++) {
+          values[index++] = new MatrixCellValue(this.getRowNumber(thisRi), this.getColumn(thisPtr),
+              this.getValue(thisPtr));
+        }
+
+        thisRi++;
+      } else {
+        for (int otherPtr = other.getRowStart(otherRi); otherPtr < other.getRowEnd(otherRi); otherPtr++) {
+          values[index++] = new MatrixCellValue(other.getRowNumber(otherRi), other.getColumn(otherPtr),
+              other.getValue(otherPtr));
+          otherPtr++;
+        }
+
+        otherRi++;
+      }
+    }
+
+    for (; thisRi < this.ner; thisRi++) {
+      for (int thisPtr = this.getRowStart(thisRi); thisPtr < this.getRowEnd(thisRi); thisPtr++) {
+        values[index++] = new MatrixCellValue(this.getRowNumber(thisRi), this.getColumn(thisPtr),
+            this.getValue(thisPtr));
+      }
+    }
+
+    for (; otherRi < other.ner; otherRi++) {
+      for (int otherPtr = other.getRowStart(otherRi); otherPtr < other.getRowEnd(otherRi); otherPtr++) {
+        values[index++] = new MatrixCellValue(other.getRowNumber(otherRi), other.getColumn(otherPtr),
+            other.getValue(otherPtr));
         otherPtr++;
       }
     }
@@ -388,19 +507,20 @@ public class CSR implements IDoubleMatrix {
     ArrayList<MatrixCellValue> values = new ArrayList<>();
     MatrixCellValue[] data = new MatrixCellValue[0];
 
-    for (int r = 0; r < other.shape.rows; r++) {
+    for (int ri = 0; ri < other.ner; ri++) {
       for (int c = 0; c < this.shape.columns; c++) {
         double sum = 0;
 
-        for (int ptr = other.getRowStart(r); ptr < other.getRowEnd(r); ptr++) {
-          sum += other.getValue(ptr) * this.get(other.getColumn(ptr), c);
+        for (int ptr = other.getRowStart(ri); ptr < other.getRowEnd(ri); ptr++) {
+          sum += other.getValue(ptr) * 
+            this.get(other.getColumn(ptr), c);
         }
 
         if (sum != 0) {
           nnz++;
+          values.add(new MatrixCellValue(other.getRowNumber(ri), c, sum));
         }
 
-        values.add(new MatrixCellValue(r, c, sum));
       }
     }
 
@@ -460,8 +580,8 @@ public class CSR implements IDoubleMatrix {
         continue;
       }
 
-      for (int ptr = this.getRowStart(other.indexCompliment(r)); ptr < this
-          .getRowEnd(other.indexCompliment(r)); ptr++) {
+      for (int ptr = this.getRowStart(this.getRowPointer(other.indexCompliment(r))); ptr < this
+          .getRowEnd(this.getRowPointer(other.indexCompliment(r))); ptr++) {
         double value = scalar * this.getValue(ptr);
 
         if (value != 0) {
