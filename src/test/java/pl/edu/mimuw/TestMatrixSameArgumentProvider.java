@@ -14,10 +14,10 @@ public class TestMatrixSameArgumentProvider implements ArgumentsProvider {
   @Override
   public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
     return Stream.of(
-      // of(FULL_2X3, FULL_2X3),
-      // of(FULL_2X3, SPARSE_2X3),
-      // of(SPARSE_2X3, FULL_2X3),
-      // of(SPARSE_2X3, SPARSE_2X3)
+      of(FULL_2X3, FULL_2X3),
+      of(FULL_2X3, SPARSE_2X3),
+      of(SPARSE_2X3, FULL_2X3),
+      of(SPARSE_2X3, SPARSE_2X3)
     );
   }
 }

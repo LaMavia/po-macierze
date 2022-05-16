@@ -14,10 +14,10 @@ public class TestMatrixTransposedShapeArgumentProvider implements ArgumentsProvi
   @Override
   public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
     return Stream.of(
-      // of(FULL_2X3, FULL_3X2),
-      // of(FULL_2X3, SPARSE_3X2),
-      // of(SPARSE_2X3, FULL_3X2),
-      // of(SPARSE_2X3, SPARSE_3X2)
+      of(FULL_2X3, FULL_3X2),
+      of(FULL_2X3, SPARSE_3X2),
+      of(SPARSE_2X3, FULL_3X2),
+      of(SPARSE_2X3, SPARSE_3X2)
     );
   }
 }

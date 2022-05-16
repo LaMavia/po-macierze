@@ -14,18 +14,18 @@ public class TestMatrixArgumentProvider implements ArgumentsProvider {
   @Override
   public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
     return Stream.of(
-     //  of(VECTOR_3),
-     //  of(FULL_2X3),
-     //  of(FULL_3X2),
-     //  of(DIAGONAL_3X3),
-     //  of(ANTI_DIAGONAL_3X3),
+      of(VECTOR_3),
+      of(FULL_2X3),
+      of(FULL_3X2),
+      of(DIAGONAL_3X3),
+      of(ANTI_DIAGONAL_3X3),
       of(SPARSE_2X3),
-      of(SPARSE_3X2)
-      // of(VECTOR_2),
-      // of(VECTOR_3),
-      // of(ID_2),
-      // of(ID_3),
-      // of(ZERO_3X2)
+      of(SPARSE_3X2),
+      of(VECTOR_2),
+      of(VECTOR_3),
+      of(ID_2),
+      of(ID_3),
+      of(ZERO_3X2)
     );
   }
 }
