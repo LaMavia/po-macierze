@@ -14,6 +14,7 @@ import pl.edu.mimuw.matrix.implementations.Full;
 import pl.edu.mimuw.matrix.implementations.Identity;
 import pl.edu.mimuw.matrix.implementations.RowMatrix;
 import pl.edu.mimuw.matrix.implementations.Vector;
+import pl.edu.mimuw.matrix.implementations.Zero;
 
 import static pl.edu.mimuw.matrix.MatrixCellValue.cell;
 import static pl.edu.mimuw.matrix.Shape.matrix;
@@ -51,6 +52,8 @@ public class Main {
       );
 
     System.out.println(m);
+
+    System.out.println(new Zero(Shape.matrix(5, 5)));
 
     // printMatrix(SPARSE_2X3.times(FULL_3X2));
 

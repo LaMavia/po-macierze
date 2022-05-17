@@ -169,4 +169,22 @@ public class Zero extends BaseMatrix {
   public IDoubleMatrix timesLeft(Vector other) {
     return timesLeftGeneric(other);
   }
+
+  @Override
+  public String toString() {
+    String row = "";
+    String out = "";
+
+    switch (this.shape.columns) {
+      case 1: row = "0\n"; break;
+      case 2: row = "0 0\n"; break;
+      default: row = "0 ... 0\n"; break;
+    }
+
+    for (int i = 0; i < this.shape.rows; i++) {
+      out += row;
+    }
+
+    return out;
+  }
 }
