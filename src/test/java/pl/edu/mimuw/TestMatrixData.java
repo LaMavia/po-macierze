@@ -1,6 +1,7 @@
 package pl.edu.mimuw;
 
 import pl.edu.mimuw.matrix.IDoubleMatrix;
+import pl.edu.mimuw.matrix.implementations.ColumnMatrix;
 import pl.edu.mimuw.matrix.implementations.RowMatrix;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -65,4 +66,6 @@ public class TestMatrixData {
   public static final IDoubleMatrix ZERO_3X2 = zero(matrix(3, 2));
 
   public static final IDoubleMatrix ROW_3X2 = new RowMatrix(matrix(3, 2), new double[] {7, 9});
+
+  public static final IDoubleMatrix COLUMN_3X2 = new ColumnMatrix(matrix(2, 3), new double[] {7, 9});
 }

@@ -25,7 +25,8 @@ public class TestMatrixArgumentProvider implements ArgumentsProvider {
       of(ID_2),
       of(ID_3),
       of(ZERO_3X2),
-      of(ROW_3X2)
+      of(ROW_3X2),
+      of(COLUMN_3X2)
     );
   }
 }

@@ -8,8 +8,8 @@ import pl.edu.mimuw.matrix.Shape;
 
 public class RowMatrix extends BaseMatrix {
 
-  private double[] values;
-  private Shape shape;
+  protected double[] values;
+  protected Shape shape;
 
   public RowMatrix(Shape shape, double[] values) {
     this.shape = shape;
@@ -209,7 +209,7 @@ public class RowMatrix extends BaseMatrix {
     assert other.shape().equals(this.shape);
 
     double[][] data = this.data();
-    
+
     for (int r = 0; r < this.shape.rows; r++) {
       for (int c = 0; c < this.shape.columns; c++) {
         data[r][c] += other.get(r, c);
