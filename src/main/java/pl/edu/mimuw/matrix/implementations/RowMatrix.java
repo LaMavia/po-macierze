@@ -11,7 +11,15 @@ public class RowMatrix extends BaseMatrix {
   protected double[] values;
   protected Shape shape;
 
+  protected void assertInputValidity(Shape shape, double[] values) {
+    assert shape != null;
+    assert values != null;
+
+    assert values.length == shape.columns;
+  }
+
   public RowMatrix(Shape shape, double[] values) {
+    this.assertInputValidity(shape, values);
     this.shape = shape;
     this.values = values;
   }
@@ -284,4 +292,25 @@ public class RowMatrix extends BaseMatrix {
     return this.shape;
   }
 
+  @Override
+  public String toString() {
+    if (this.values.length == 0) {
+      return "\n";
+    }
+
+    String out = "";
+    String row = "";
+
+    for (int i = 0; i < this.values.length - 1; i++) {
+      row += this.values[i] + " ";
+    }
+
+    row += this.values[this.values.length - 1] + "\n";
+
+    for (int i = 0; i < this.shape.rows; i++) {
+      out += row;
+    }
+
+    return out;
+  }
 }

@@ -4,6 +4,14 @@ import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.Shape;
 
 public class ColumnMatrix extends RowMatrix {
+  @Override
+  protected void assertInputValidity(Shape shape, double[] values) {
+    assert shape != null;
+    assert values != null;
+    
+    assert values.length == shape.rows;
+  }
+
   public ColumnMatrix(Shape shape, double[] values) {
     super(shape, values);
   }
@@ -109,5 +117,22 @@ public class ColumnMatrix extends RowMatrix {
   @Override
   public double frobeniusNorm() {
     return Math.sqrt(this.shape.columns * this.normOne());
+  }
+
+  @Override
+  public String toString() {
+    String out = "";
+
+    for (int r = 0; r < this.shape.rows; r++) {
+      if (this.shape.columns >= 3) {
+        out += String.format("%.2f ... %.2f\n", this.get(r, 0), this.get(r, 0));
+      } else if (this.shape.columns == 2) {
+        out += String.format("%.2f %.2f\n", this.get(r, 0), this.get(r, 0));
+      } else {
+        out += String.format("%.2f\n", this.get(r, 0));
+      }
+    }
+
+    return out;
   }
 }

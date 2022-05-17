@@ -8,6 +8,7 @@ import pl.edu.mimuw.matrix.MatrixCellValue;
 import pl.edu.mimuw.matrix.Shape;
 import pl.edu.mimuw.matrix.implementations.AntiDiagonal;
 import pl.edu.mimuw.matrix.implementations.CSR;
+import pl.edu.mimuw.matrix.implementations.ColumnMatrix;
 import pl.edu.mimuw.matrix.implementations.Diagonal;
 import pl.edu.mimuw.matrix.implementations.Full;
 import pl.edu.mimuw.matrix.implementations.Identity;
@@ -30,15 +31,20 @@ public class Main {
 
   public static void main(String[] args) {
     /*
-    var a = new RowMatrix(Shape.matrix(3, 3), new double[] { 4, 5, 6 });
+     * var a = new RowMatrix(Shape.matrix(3, 3), new double[] { 4, 5, 6 });
+     * 
+     * printMatrix(a);
+     * 
+     * printMatrix(new Diagonal(1, 2, 3).times(a));
+     */
 
-    printMatrix(a);
+    // System.out.println(new AntiDiagonal(1, 2, 3, 4, 5, 6));
+    // System.out.println(new Diagonal(1, 2, 3, 4, 5, 6));
 
-    printMatrix(new Diagonal(1, 2, 3).times(a));
-    */
+    // System.out.println(new RowMatrix(Shape.matrix(5, 5), new double[] { 1, 2,
+    // 3, 4, 5 }));
 
-    System.out.println(new AntiDiagonal(1, 2, 3, 4, 5, 6));
-    System.out.println(new Diagonal(1, 2, 3, 4, 5, 6));
+    System.out.println(new ColumnMatrix(Shape.matrix(5, 5), new double[] { 1, 2, 3, 4, 5 }));
 
     // printMatrix(SPARSE_2X3.times(FULL_3X2));
 
