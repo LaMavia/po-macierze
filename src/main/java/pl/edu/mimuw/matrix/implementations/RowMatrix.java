@@ -298,7 +298,7 @@ public class RowMatrix extends BaseMatrix {
       return "\n";
     }
 
-    String out = "";
+    String out = super.toString();
     String row = "";
 
     for (int i = 0; i < this.values.length - 1; i++) {

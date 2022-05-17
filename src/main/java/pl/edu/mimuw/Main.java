@@ -45,16 +45,13 @@ public class Main {
     // System.out.println(new RowMatrix(Shape.matrix(5, 5), new double[] { 1, 2,
     // 3, 4, 5 }));
 
-      var m = new CSR(Shape.matrix(10, 10), 
+    var m = new CSR(Shape.matrix(10, 10),
         cell(5, 5, 9),
         cell(1, 1, 87),
-        cell(9, 7, 3)
-      );
+        cell(9, 7, 3));
 
-    System.out.println(m);
-
-    System.out.println(new Zero(Shape.matrix(5, 5)));
-    System.out.println(new Identity(5));
+    var v = vector(1, 2, 3, 4, 5);
+    printMatrix(v);
 
     // printMatrix(SPARSE_2X3.times(FULL_3X2));
 

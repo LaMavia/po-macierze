@@ -370,7 +370,7 @@ public class Diagonal extends BaseMatrix {
 
   @Override
   public String toString() {
-    String out = "";
+    String out = super.toString();
 
     for (int r = 0; r < this.size(); r++) {
       String padLeft = padding(this.leftDistance(r));

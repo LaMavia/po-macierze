@@ -336,4 +336,19 @@ public class Full extends BaseMatrix {
 
     return new Full(data);
   }
+
+  @Override
+  public String toString() {
+    String out = super.toString();
+
+    for (int r = 0; r < this.shape.rows; r++) {
+      for (int c = 0; c < this.shape.columns - 1; c++) {
+        out += this.get(r, c) + " ";
+      }
+
+      out += this.get(r, this.shape.columns - 1) + "\n";
+    }
+
+    return out;
+  }
 }

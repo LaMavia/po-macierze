@@ -172,8 +172,8 @@ public class Zero extends BaseMatrix {
 
   @Override
   public String toString() {
+    String out = super.toString();
     String row = "";
-    String out = "";
 
     switch (this.shape.columns) {
       case 1: row = "0\n"; break;

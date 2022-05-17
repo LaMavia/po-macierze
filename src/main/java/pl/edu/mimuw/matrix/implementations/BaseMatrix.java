@@ -54,4 +54,9 @@ public abstract class BaseMatrix implements IDoubleMatrix {
 
     return new Full(data);
   }
+
+  @Override
+  public String toString() {
+    return this.shape().toString() + "\n";
+  }
 }

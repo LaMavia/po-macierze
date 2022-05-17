@@ -8,7 +8,7 @@ public class ColumnMatrix extends RowMatrix {
   protected void assertInputValidity(Shape shape, double[] values) {
     assert shape != null;
     assert values != null;
-    
+
     assert values.length == shape.rows;
   }
 
@@ -121,7 +121,7 @@ public class ColumnMatrix extends RowMatrix {
 
   @Override
   public String toString() {
-    String out = "";
+    String out = super.toString();
 
     for (int r = 0; r < this.shape.rows; r++) {
       if (this.shape.columns >= 3) {

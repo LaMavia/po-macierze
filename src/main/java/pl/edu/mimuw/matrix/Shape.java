@@ -51,6 +51,6 @@ public final class Shape {
 
   @Override
   public String toString() {
-    return String.format("Shape {rows = %d, columns = %d}", this.rows, this.columns);
+    return String.format("Dimensions: %d x %d", this.rows, this.columns);
   }
 }

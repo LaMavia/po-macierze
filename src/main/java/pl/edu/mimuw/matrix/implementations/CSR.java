@@ -650,7 +650,7 @@ public class CSR implements IDoubleMatrix {
 
   @Override
   public String toString() {
-    String out = "";
+    String out = super.toString();
 
     for (int r = 0; r < this.shape.rows; r++) {
       out += this.stringifyRow(r);
