@@ -1,11 +1,11 @@
 package pl.edu.mimuw.matrix.implementations;
 
 import java.util.Arrays;
-
 import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.Shape;
 
 public class Vector extends BaseMatrix {
+
   private int[] index;
   private double[] value;
 
@@ -70,7 +70,11 @@ public class Vector extends BaseMatrix {
       int thisRowIndex = 0;
       values[i] = 0;
 
-      for (int j = other.getRowStart(rowPtr); j < other.getRowEnd(rowPtr); j++) {
+      for (
+        int j = other.getRowStart(rowPtr);
+        j < other.getRowEnd(rowPtr);
+        j++
+      ) {
         int columnIndex = other.getColumn(j);
 
         // Move the vector pointer
@@ -124,7 +128,8 @@ public class Vector extends BaseMatrix {
     double[] newValue = new double[otherShape.rows];
 
     for (int i = 0; i < this.index.length - 1; i++) {
-      newValue[this.index[i]] = this.value[i] * other.get(this.index[i], this.index[i]);
+      newValue[this.index[i]] =
+        this.value[i] * other.get(this.index[i], this.index[i]);
     }
 
     return new Vector(newValue);
@@ -140,7 +145,8 @@ public class Vector extends BaseMatrix {
 
     for (int i = 0; i < this.index.length - 1; i++) {
       int otherIndex = otherShape.rows - this.index[i] - 1;
-      newValue[this.index[i]] = this.value[i] * other.get(otherIndex, otherIndex);
+      newValue[this.index[i]] =
+        this.value[i] * other.get(otherIndex, otherIndex);
     }
 
     return new Vector(newValue);
@@ -251,7 +257,6 @@ public class Vector extends BaseMatrix {
     } else {
       return new Vector(vThis + vOther);
     }
-
   }
 
   @Override
@@ -263,8 +268,7 @@ public class Vector extends BaseMatrix {
 
   @Override
   public IDoubleMatrix plus(double scalar) {
-    if (Math.abs(scalar) == 0)
-      return this;
+    if (Math.abs(scalar) == 0) return this;
 
     double[][] thisData = this.data();
     double[] data = new double[this.numberOfRows()];
@@ -281,7 +285,11 @@ public class Vector extends BaseMatrix {
     assert 0 <= row && row < this.index[this.index.length - 1];
     assert column == 0;
 
-    for (int i = 0; i < this.index[this.index.length - 1] && this.index[i] <= row; i++) {
+    for (
+      int i = 0;
+      i < this.index[this.index.length - 1] && this.index[i] <= row;
+      i++
+    ) {
       if (this.index[i] == row) {
         return this.value[i];
       }
@@ -311,7 +319,6 @@ public class Vector extends BaseMatrix {
     }
 
     return sum;
-
   }
 
   @Override
@@ -358,8 +365,12 @@ public class Vector extends BaseMatrix {
 
     int iThis = 0, iOther = 0, iNew = 0;
 
-    while (!(this.index[iThis] == other.index[iOther] &&
-        this.index[iThis] == this.numberOfRows())) {
+    while (
+      !(
+        this.index[iThis] == other.index[iOther] &&
+        this.index[iThis] == this.numberOfRows()
+      )
+    ) {
       if (this.index[iThis] == other.index[iOther]) {
         double newValue = this.value[iThis] + other.value[iOther];
 

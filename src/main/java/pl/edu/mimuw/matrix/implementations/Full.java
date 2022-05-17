@@ -1,13 +1,13 @@
 package pl.edu.mimuw.matrix.implementations;
 
 import java.util.ArrayList;
-
 import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.MatrixCellValue;
 import pl.edu.mimuw.matrix.Shape;
 
 // row, column
 public class Full extends BaseMatrix {
+
   private double[][] data;
   private final Shape shape;
 
@@ -246,7 +246,11 @@ public class Full extends BaseMatrix {
       for (int c = 0; c < this.shape.columns; c++) {
         double sum = 0;
 
-        for (int ptr = other.getRowStart(ri); ptr < other.getRowEnd(ri); ptr++) {
+        for (
+          int ptr = other.getRowStart(ri);
+          ptr < other.getRowEnd(ri);
+          ptr++
+        ) {
           sum += other.getValue(ptr) * this.get(other.getColumn(ptr), c);
         }
 

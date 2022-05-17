@@ -2,12 +2,12 @@ package pl.edu.mimuw.matrix.implementations;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.MatrixCellValue;
 import pl.edu.mimuw.matrix.Shape;
 
 public class CSR extends BaseMatrix {
+
   public final int nnz;
   public final int ner;
   private final double[] value;
@@ -42,8 +42,7 @@ public class CSR extends BaseMatrix {
     int nnz = 0;
 
     for (MatrixCellValue v : values) {
-      if (v.value != 0)
-        nnz++;
+      if (v.value != 0) nnz++;
     }
 
     return nnz;
@@ -61,11 +60,12 @@ public class CSR extends BaseMatrix {
   }
 
   private CSR(
-      double[] value,
-      int[] rowPointer,
-      int[] column,
-      int[] row,
-      Shape shape) {
+    double[] value,
+    int[] rowPointer,
+    int[] column,
+    int[] row,
+    Shape shape
+  ) {
     this.nnz = value.length;
     this.ner = row.length - 1;
 
@@ -98,8 +98,7 @@ public class CSR extends BaseMatrix {
     this.rowPointer[this.ner] = this.shape.rows;
 
     for (MatrixCellValue v : values) {
-      if (v.value == 0)
-        continue;
+      if (v.value == 0) continue;
 
       if (v.row > previousRow) {
         this.rowPointer[rowIndex] = v.row;
@@ -117,7 +116,11 @@ public class CSR extends BaseMatrix {
   }
 
   public int getRowPointer(int r) {
-    assert 0 <= r && r < this.shape.rows : String.format("%d/%d", r, this.shape.rows);
+    assert 0 <= r && r < this.shape.rows : String.format(
+      "%d/%d",
+      r,
+      this.shape.rows
+    );
 
     int i = 0;
 
@@ -331,27 +334,47 @@ public class CSR extends BaseMatrix {
         int thisPtr = this.getRowStart(thisRi);
         int otherPtr = other.getRowStart(otherRi);
 
-        while (thisPtr < this.getRowEnd(thisRi) && otherPtr < other.getRowEnd(otherRi)) {
+        while (
+          thisPtr < this.getRowEnd(thisRi) &&
+          otherPtr < other.getRowEnd(otherRi)
+        ) {
           int thisC = this.getColumn(thisPtr);
           int otherC = other.getColumn(otherPtr);
 
           if (thisC == otherC) {
-            values[index++] = new MatrixCellValue(r, thisC, this.getValue(thisPtr++) + other.getValue(otherPtr++));
+            values[index++] =
+              new MatrixCellValue(
+                r,
+                thisC,
+                this.getValue(thisPtr++) + other.getValue(otherPtr++)
+              );
           } else if (thisC < otherC) {
-            values[index++] = new MatrixCellValue(r, thisC, this.getValue(thisPtr++));
+            values[index++] =
+              new MatrixCellValue(r, thisC, this.getValue(thisPtr++));
           } else {
-            values[index++] = new MatrixCellValue(r, otherC, other.getValue(otherPtr++));
+            values[index++] =
+              new MatrixCellValue(r, otherC, other.getValue(otherPtr++));
           }
         }
 
         // Push unmatched columns
         while (thisPtr < this.getRowEnd(thisRi)) {
-          values[index++] = new MatrixCellValue(r, this.getColumn(thisPtr), this.getValue(thisPtr));
+          values[index++] =
+            new MatrixCellValue(
+              r,
+              this.getColumn(thisPtr),
+              this.getValue(thisPtr)
+            );
           thisPtr++;
         }
 
         while (otherPtr < other.getRowEnd(otherRi)) {
-          values[index++] = new MatrixCellValue(r, other.getColumn(otherPtr), other.getValue(otherPtr));
+          values[index++] =
+            new MatrixCellValue(
+              r,
+              other.getColumn(otherPtr),
+              other.getValue(otherPtr)
+            );
           otherPtr++;
         }
 
@@ -359,17 +382,33 @@ public class CSR extends BaseMatrix {
         otherRi++;
       } else if (this.getRowNumber(thisRi) < other.getRowNumber(otherRi)) {
         // Push unmatched row from this
-        for (int thisPtr = this.getRowStart(thisRi); thisPtr < this.getRowEnd(thisRi); thisPtr++) {
-          values[index++] = new MatrixCellValue(this.getRowNumber(thisRi), this.getColumn(thisPtr),
-              this.getValue(thisPtr));
+        for (
+          int thisPtr = this.getRowStart(thisRi);
+          thisPtr < this.getRowEnd(thisRi);
+          thisPtr++
+        ) {
+          values[index++] =
+            new MatrixCellValue(
+              this.getRowNumber(thisRi),
+              this.getColumn(thisPtr),
+              this.getValue(thisPtr)
+            );
         }
 
         thisRi++;
       } else {
         // Push unmatched row from other
-        for (int otherPtr = other.getRowStart(otherRi); otherPtr < other.getRowEnd(otherRi); otherPtr++) {
-          values[index++] = new MatrixCellValue(other.getRowNumber(otherRi), other.getColumn(otherPtr),
-              other.getValue(otherPtr));
+        for (
+          int otherPtr = other.getRowStart(otherRi);
+          otherPtr < other.getRowEnd(otherRi);
+          otherPtr++
+        ) {
+          values[index++] =
+            new MatrixCellValue(
+              other.getRowNumber(otherRi),
+              other.getColumn(otherPtr),
+              other.getValue(otherPtr)
+            );
           otherPtr++;
         }
 
@@ -378,16 +417,32 @@ public class CSR extends BaseMatrix {
     }
 
     for (; thisRi < this.ner; thisRi++) {
-      for (int thisPtr = this.getRowStart(thisRi); thisPtr < this.getRowEnd(thisRi); thisPtr++) {
-        values[index++] = new MatrixCellValue(this.getRowNumber(thisRi), this.getColumn(thisPtr),
-            this.getValue(thisPtr));
+      for (
+        int thisPtr = this.getRowStart(thisRi);
+        thisPtr < this.getRowEnd(thisRi);
+        thisPtr++
+      ) {
+        values[index++] =
+          new MatrixCellValue(
+            this.getRowNumber(thisRi),
+            this.getColumn(thisPtr),
+            this.getValue(thisPtr)
+          );
       }
     }
 
     for (; otherRi < other.ner; otherRi++) {
-      for (int otherPtr = other.getRowStart(otherRi); otherPtr < other.getRowEnd(otherRi); otherPtr++) {
-        values[index++] = new MatrixCellValue(other.getRowNumber(otherRi), other.getColumn(otherPtr),
-            other.getValue(otherPtr));
+      for (
+        int otherPtr = other.getRowStart(otherRi);
+        otherPtr < other.getRowEnd(otherRi);
+        otherPtr++
+      ) {
+        values[index++] =
+          new MatrixCellValue(
+            other.getRowNumber(otherRi),
+            other.getColumn(otherPtr),
+            other.getValue(otherPtr)
+          );
         otherPtr++;
       }
     }
@@ -467,16 +522,18 @@ public class CSR extends BaseMatrix {
       for (int c = 0; c < this.shape.columns; c++) {
         double sum = 0;
 
-        for (int ptr = other.getRowStart(ri); ptr < other.getRowEnd(ri); ptr++) {
-          sum += other.getValue(ptr) *
-              this.get(other.getColumn(ptr), c);
+        for (
+          int ptr = other.getRowStart(ri);
+          ptr < other.getRowEnd(ri);
+          ptr++
+        ) {
+          sum += other.getValue(ptr) * this.get(other.getColumn(ptr), c);
         }
 
         if (sum != 0) {
           nnz++;
           values.add(new MatrixCellValue(other.getRowNumber(ri), c, sum));
         }
-
       }
     }
 
@@ -508,7 +565,6 @@ public class CSR extends BaseMatrix {
         if (sum != 0) {
           values.add(new MatrixCellValue(r, c, sum));
         }
-
       }
     }
 
@@ -537,8 +593,7 @@ public class CSR extends BaseMatrix {
         continue;
       }
 
-      for (int ptr = this.getRowStart(ri); ptr < this
-          .getRowEnd(ri); ptr++) {
+      for (int ptr = this.getRowStart(ri); ptr < this.getRowEnd(ri); ptr++) {
         double value = scalar * this.getValue(ptr);
 
         if (value != 0) {
@@ -572,7 +627,8 @@ public class CSR extends BaseMatrix {
     assert other.shape().columns == this.shape.rows;
 
     int index = 0;
-    MatrixCellValue[] values = new MatrixCellValue[this.nnz * other.numberOfRows()];
+    MatrixCellValue[] values = new MatrixCellValue[this.nnz *
+    other.numberOfRows()];
 
     for (int r = 0; r < other.numberOfRows(); r++) {
       double scalar = other.get(r, 0);
@@ -622,7 +678,6 @@ public class CSR extends BaseMatrix {
     String out = "";
 
     if (ptr < ptrEnd) {
-
       switch (this.getColumn(ptr)) {
         case 0:
           break;
@@ -638,16 +693,26 @@ public class CSR extends BaseMatrix {
       }
 
       for (; ptr < ptrEnd - 1; ptr++) {
-        out += this.stringifyCell(ptr, this.getColumn(ptr + 1) - this.getColumn(ptr), false);
+        out +=
+          this.stringifyCell(
+              ptr,
+              this.getColumn(ptr + 1) - this.getColumn(ptr),
+              false
+            );
       }
 
-      out += this.stringifyCell(ptr, this.shape.columns - 1 - this.getColumn(ptr), true) + "\n";
+      out +=
+        this.stringifyCell(
+            ptr,
+            this.shape.columns - 1 - this.getColumn(ptr),
+            true
+          ) +
+        "\n";
 
       return out;
     } else {
       return "0 ... 0\n";
     }
-
   }
 
   @Override

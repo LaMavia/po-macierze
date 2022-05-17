@@ -1,12 +1,12 @@
 package pl.edu.mimuw.matrix.implementations;
 
 import java.util.Arrays;
-
 import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.MatrixCellValue;
 import pl.edu.mimuw.matrix.Shape;
 
 public class Diagonal extends BaseMatrix {
+
   protected double[] values;
 
   public Diagonal(double... values) {
@@ -159,7 +159,12 @@ public class Diagonal extends BaseMatrix {
       }
 
       if (!visitedDiagonal) {
-        values[index++] = new MatrixCellValue(r, this.indexCompliment(r), this.get(r, this.indexCompliment(r)));
+        values[index++] =
+          new MatrixCellValue(
+            r,
+            this.indexCompliment(r),
+            this.get(r, this.indexCompliment(r))
+          );
       }
     }
 
@@ -210,10 +215,12 @@ public class Diagonal extends BaseMatrix {
       int iOther = this.size() - i - 1;
 
       if (i == iOther) {
-        values[index++] = new MatrixCellValue(i, i, this.get(i, i) + other.get(iOther, iOther));
+        values[index++] =
+          new MatrixCellValue(i, i, this.get(i, i) + other.get(iOther, iOther));
       } else {
         values[index++] = new MatrixCellValue(i, i, this.get(i, i));
-        values[index++] = new MatrixCellValue(iOther, iOther, other.get(iOther, iOther));
+        values[index++] =
+          new MatrixCellValue(iOther, iOther, other.get(iOther, iOther));
       }
     }
 
@@ -256,7 +263,11 @@ public class Diagonal extends BaseMatrix {
         double sum = 0;
 
         // @todo optimise
-        for (int rowPtr = other.getRowStart(ri); rowPtr < other.getRowEnd(ri); rowPtr++) {
+        for (
+          int rowPtr = other.getRowStart(ri);
+          rowPtr < other.getRowEnd(ri);
+          rowPtr++
+        ) {
           sum += this.get(other.getColumn(rowPtr), c) * other.getValue(rowPtr);
         }
 
@@ -379,11 +390,13 @@ public class Diagonal extends BaseMatrix {
       String padLeft = padding(this.leftDistance(r));
       String padRight = padding(this.rightDistance(r));
 
-      out += String.format(
+      out +=
+        String.format(
           "%s%.2f%s\n",
           padLeft.equals("") ? padLeft : (padLeft + " "),
           this.get(r, this.indexCompliment(r)),
-          padRight.equals("") ? padRight : (" " + padRight));
+          padRight.equals("") ? padRight : (" " + padRight)
+        );
     }
 
     return out;

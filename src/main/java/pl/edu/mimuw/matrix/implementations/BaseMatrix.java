@@ -3,6 +3,7 @@ package pl.edu.mimuw.matrix.implementations;
 import pl.edu.mimuw.matrix.IDoubleMatrix;
 
 public abstract class BaseMatrix implements IDoubleMatrix {
+
   @Override
   public IDoubleMatrix minus(IDoubleMatrix other) {
     assert other != null;

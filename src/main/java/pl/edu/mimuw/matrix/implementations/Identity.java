@@ -1,12 +1,12 @@
 package pl.edu.mimuw.matrix.implementations;
 
 import java.util.Arrays;
-
 import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.MatrixCellValue;
 import pl.edu.mimuw.matrix.Shape;
 
 public class Identity extends BaseMatrix {
+
   private final int size;
 
   public Identity(int size) {
@@ -194,10 +194,12 @@ public class Identity extends BaseMatrix {
       int iOther = this.size - i - 1;
 
       if (i == iOther) {
-        values[index++] = new MatrixCellValue(i, i, this.get(i, i) + other.get(iOther, iOther));
+        values[index++] =
+          new MatrixCellValue(i, i, this.get(i, i) + other.get(iOther, iOther));
       } else {
         values[index++] = new MatrixCellValue(i, i, this.get(i, i));
-        values[index++] = new MatrixCellValue(iOther, iOther, other.get(iOther, iOther));
+        values[index++] =
+          new MatrixCellValue(iOther, iOther, other.get(iOther, iOther));
       }
     }
 
@@ -292,11 +294,13 @@ public class Identity extends BaseMatrix {
       String padLeft = padding(this.leftDistance(r));
       String padRight = padding(this.rightDistance(r));
 
-      out += String.format(
+      out +=
+        String.format(
           "%s%.2f%s\n",
           padLeft.equals("") ? padLeft : (padLeft + " "),
           this.get(r, r),
-          padRight.equals("") ? padRight : (" " + padRight));
+          padRight.equals("") ? padRight : (" " + padRight)
+        );
     }
 
     return out;

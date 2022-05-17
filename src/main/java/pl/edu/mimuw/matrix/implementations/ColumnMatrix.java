@@ -4,6 +4,7 @@ import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.Shape;
 
 public class ColumnMatrix extends RowMatrix {
+
   @Override
   protected void assertInputValidity(Shape shape, double[] values) {
     assert shape != null;

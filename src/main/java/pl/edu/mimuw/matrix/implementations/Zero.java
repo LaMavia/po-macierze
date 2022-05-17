@@ -4,6 +4,7 @@ import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.Shape;
 
 public class Zero extends BaseMatrix {
+
   final Shape shape;
 
   public Zero(Shape shape) {
@@ -29,7 +30,11 @@ public class Zero extends BaseMatrix {
 
   @Override
   public IDoubleMatrix plus(IDoubleMatrix other) {
-    assert this.shape.equals(other.shape()) : String.format("%s != %s", this.shape, other.shape());
+    assert this.shape.equals(other.shape()) : String.format(
+      "%s != %s",
+      this.shape,
+      other.shape()
+    );
 
     return other;
   }
@@ -176,9 +181,15 @@ public class Zero extends BaseMatrix {
     String row = "";
 
     switch (this.shape.columns) {
-      case 1: row = "0\n"; break;
-      case 2: row = "0 0\n"; break;
-      default: row = "0 ... 0\n"; break;
+      case 1:
+        row = "0\n";
+        break;
+      case 2:
+        row = "0 0\n";
+        break;
+      default:
+        row = "0 ... 0\n";
+        break;
     }
 
     for (int i = 0; i < this.shape.rows; i++) {

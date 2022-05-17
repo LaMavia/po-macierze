@@ -1,7 +1,6 @@
 package pl.edu.mimuw.matrix.implementations;
 
 import java.util.ArrayList;
-
 import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.MatrixCellValue;
 import pl.edu.mimuw.matrix.Shape;
@@ -44,7 +43,11 @@ public class RowMatrix extends BaseMatrix {
       for (int c = 0; c < this.shape.columns; c++) {
         double value = 0;
 
-        for (int ptr = other.getRowStart(ri); ptr < other.getRowEnd(ri); ptr++) {
+        for (
+          int ptr = other.getRowStart(ri);
+          ptr < other.getRowEnd(ri);
+          ptr++
+        ) {
           value += other.getValue(ptr) * this.get(other.getColumn(ptr), c);
         }
 
@@ -159,7 +162,8 @@ public class RowMatrix extends BaseMatrix {
 
     for (int ri = 0; ri < other.ner; ri++) {
       for (int ptr = other.getRowStart(ri); ptr < other.getRowEnd(ri); ptr++) {
-        data[other.getRowNumber(ri)][other.getColumn(ptr)] += other.getValue(ptr);
+        data[other.getRowNumber(ri)][other.getColumn(ptr)] +=
+          other.getValue(ptr);
       }
     }
 
@@ -190,7 +194,8 @@ public class RowMatrix extends BaseMatrix {
     double[][] data = this.data();
 
     for (int i = 0; i < this.shape.rows; i++) {
-      data[i][other.indexCompliment(i)] += other.get(i, other.indexCompliment(i));
+      data[i][other.indexCompliment(i)] +=
+        other.get(i, other.indexCompliment(i));
     }
 
     return new Full(data);
@@ -201,9 +206,9 @@ public class RowMatrix extends BaseMatrix {
     assert other != null;
     assert other.shape().equals(this.shape);
 
-    return new Full(new double[][] {
-        new double[] { this.get(0, 0) + other.get(0, 0) }
-    });
+    return new Full(
+      new double[][] { new double[] { this.get(0, 0) + other.get(0, 0) } }
+    );
   }
 
   @Override

@@ -10,8 +10,7 @@ import pl.edu.mimuw.matrix.implementations.Zero;
 
 public class DoubleMatrixFactory {
 
-  private DoubleMatrixFactory() {
-  }
+  private DoubleMatrixFactory() {}
 
   public static IDoubleMatrix sparse(Shape shape, MatrixCellValue... values) {
     return new CSR(shape, values);
