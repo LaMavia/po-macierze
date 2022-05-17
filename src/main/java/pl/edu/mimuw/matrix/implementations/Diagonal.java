@@ -21,6 +21,8 @@ public class Diagonal extends BaseMatrix {
 
   @Override
   public IDoubleMatrix times(IDoubleMatrix other) {
+    assert other != null;
+    
     return other.timesLeft(this);
   }
 

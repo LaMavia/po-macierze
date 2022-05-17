@@ -11,6 +11,7 @@ import pl.edu.mimuw.matrix.implementations.CSR;
 import pl.edu.mimuw.matrix.implementations.Diagonal;
 import pl.edu.mimuw.matrix.implementations.Full;
 import pl.edu.mimuw.matrix.implementations.Identity;
+import pl.edu.mimuw.matrix.implementations.RowMatrix;
 import pl.edu.mimuw.matrix.implementations.Vector;
 
 import static pl.edu.mimuw.matrix.MatrixCellValue.cell;
@@ -28,29 +29,11 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    final var l = DoubleMatrixFactory.sparse(
-        matrix(1_000_000, 1_000_000_000),
-        cell(0, 0, 3),
-        cell(0, 213, 2),
-        cell(0, 555_555, 66),
+    var a = new RowMatrix(Shape.matrix(3, 3), new double[] { 4, 5, 6 });
 
-        cell(456_456, 1, 7),
-        cell(456_456, 321, 8),
-        cell(456_456, 444_444, 66)
+    printMatrix(a);
 
-    );
-    final var r = DoubleMatrixFactory.sparse(
-        matrix(1_000_000_000, 1_000_000),
-        cell(0, 0, 4),
-        cell(213, 0, 5),
-        cell(666_666, 0, 66),
-
-        cell(1, 456_456, 9),
-        cell(321, 456_456, 10),
-        cell(444_445, 456_456, 66));
-    final var result = l.times(r);
-
-    System.out.println(result);
+    printMatrix(new Diagonal(1, 2, 3).times(a));
 
     // printMatrix(SPARSE_2X3.times(FULL_3X2));
 
