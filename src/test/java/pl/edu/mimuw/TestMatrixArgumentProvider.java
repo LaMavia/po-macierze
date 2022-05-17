@@ -14,7 +14,6 @@ public class TestMatrixArgumentProvider implements ArgumentsProvider {
   @Override
   public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
     return Stream.of(
-      of(VECTOR_3),
       of(FULL_2X3),
       of(FULL_3X2),
       of(DIAGONAL_3X3),

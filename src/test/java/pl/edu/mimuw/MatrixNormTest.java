@@ -8,8 +8,8 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static java.lang.Math.sqrt;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static pl.edu.mimuw.TestMatrixData.TEST_PRECISION;
 import static pl.edu.mimuw.matrix.DoubleMatrixFactory.*;
 import static pl.edu.mimuw.matrix.MatrixCellValue.cell;
 import static pl.edu.mimuw.matrix.Shape.matrix;
@@ -203,6 +203,6 @@ public class MatrixNormTest {
 
   private static void testMatrixNorm(IDoubleMatrix m, Function<IDoubleMatrix, Double> matrixNorm, double expectedNorm) {
     final var norm = matrixNorm.apply(m);
-    assertEquals(expectedNorm, norm);
+    assertEquals(expectedNorm, norm, TEST_PRECISION);
   }
 }
