@@ -29,11 +29,16 @@ public class Main {
   }
 
   public static void main(String[] args) {
+    /*
     var a = new RowMatrix(Shape.matrix(3, 3), new double[] { 4, 5, 6 });
 
     printMatrix(a);
 
     printMatrix(new Diagonal(1, 2, 3).times(a));
+    */
+
+    System.out.println(new AntiDiagonal(1, 2, 3, 4, 5, 6));
+    System.out.println(new Diagonal(1, 2, 3, 4, 5, 6));
 
     // printMatrix(SPARSE_2X3.times(FULL_3X2));
 

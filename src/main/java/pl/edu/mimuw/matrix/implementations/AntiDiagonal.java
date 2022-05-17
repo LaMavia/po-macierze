@@ -102,4 +102,14 @@ public class AntiDiagonal extends Diagonal {
 
     return new Diagonal(values);
   }
+
+  @Override
+  protected int leftDistance(int r) {
+    return this.size() - r - 1;
+  }
+
+  @Override
+  protected int rightDistance(int r) {
+    return r;
+  }
 }

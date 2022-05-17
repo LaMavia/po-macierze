@@ -22,7 +22,7 @@ public class Diagonal extends BaseMatrix {
   @Override
   public IDoubleMatrix times(IDoubleMatrix other) {
     assert other != null;
-    
+
     return other.timesLeft(this);
   }
 
@@ -116,7 +116,7 @@ public class Diagonal extends BaseMatrix {
     double sum = 0;
 
     for (double v : this.values) {
-      sum += v*v;
+      sum += v * v;
     }
 
     return Math.sqrt(sum);
@@ -345,5 +345,44 @@ public class Diagonal extends BaseMatrix {
     }
 
     return new Vector(value);
+  }
+
+  private String padding(int distance) {
+    switch (distance) {
+      case 0:
+        return "";
+      case 1:
+        return "0";
+      case 2:
+        return "0 0";
+      default:
+        return "0...0";
+    }
+  }
+
+  protected int leftDistance(int r) {
+    return r;
+  }
+
+  protected int rightDistance(int r) {
+    return this.size() - r - 1;
+  }
+
+  @Override
+  public String toString() {
+    String out = "";
+
+    for (int r = 0; r < this.size(); r++) {
+      String padLeft = padding(this.leftDistance(r));
+      String padRight = padding(this.rightDistance(r));
+
+      out += String.format(
+          "%s%.2f%s\n",
+          padLeft.equals("") ? padLeft : (padLeft + " "),
+          this.get(r, this.indexCompliment(r)),
+          padRight.equals("") ? padRight : (" " + padRight));
+    }
+
+    return out;
   }
 }
