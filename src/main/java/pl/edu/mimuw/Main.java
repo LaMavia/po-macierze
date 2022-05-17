@@ -54,6 +54,7 @@ public class Main {
     System.out.println(m);
 
     System.out.println(new Zero(Shape.matrix(5, 5)));
+    System.out.println(new Identity(5));
 
     // printMatrix(SPARSE_2X3.times(FULL_3X2));
 
