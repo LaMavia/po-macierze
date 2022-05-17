@@ -165,15 +165,6 @@ public class CSR implements IDoubleMatrix {
   }
 
   @Override
-  public String toString() {
-    return String.format("ner:\n%s\nrow:\n%s\ncolumn:\n%s\nvalue:\n%s\n",
-        Arrays.toString(this.rowPointer),
-        Arrays.toString(this.row),
-        Arrays.toString(this.column),
-        Arrays.toString(this.value));
-  }
-
-  @Override
   public IDoubleMatrix times(double scalar) {
     if (scalar == 0.0) {
       return new Zero(this.shape);
@@ -604,5 +595,67 @@ public class CSR implements IDoubleMatrix {
     }
 
     return new CSR(newShape, Arrays.copyOf(values, index));
+  }
+
+  private String stringifyCell(int ptr, int distance, boolean last) {
+    String out = "";
+
+    if (distance >= 3) {
+      out = this.getValue(ptr) + " ... ";
+    } else if (distance == 2) {
+      out = this.getValue(ptr) + " 0 ";
+    } else {
+      out = this.getValue(ptr) + " ";
+    }
+
+    return out + (last ? "0" : "");
+  }
+
+  private String stringifyRow(int row) {
+    int ri = this.getRowPointer(row);
+
+    int ptr = this.getRowStart(ri);
+    int ptrEnd = this.getRowEnd(ri);
+
+    String out = "";
+
+    if (ptr < ptrEnd) {
+
+      switch (this.getColumn(ptr)) {
+        case 0:
+          break;
+        case 1:
+          out += "0 ";
+          break;
+        case 2:
+          out += "0 0 ";
+          break;
+        default:
+          out += "0 ... ";
+          break;
+      }
+
+      for (; ptr < ptrEnd - 1; ptr++) {
+        out += this.stringifyCell(ptr, this.getColumn(ptr + 1) - this.getColumn(ptr), false);
+      }
+
+      out += this.stringifyCell(ptr, this.shape.columns - 1 - this.getColumn(ptr), true) + "\n";
+
+      return out;
+    } else {
+      return "0 ... 0\n";
+    }
+
+  }
+
+  @Override
+  public String toString() {
+    String out = "";
+
+    for (int r = 0; r < this.shape.rows; r++) {
+      out += this.stringifyRow(r);
+    }
+
+    return out;
   }
 }

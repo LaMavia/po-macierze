@@ -44,7 +44,13 @@ public class Main {
     // System.out.println(new RowMatrix(Shape.matrix(5, 5), new double[] { 1, 2,
     // 3, 4, 5 }));
 
-    System.out.println(new ColumnMatrix(Shape.matrix(5, 5), new double[] { 1, 2, 3, 4, 5 }));
+      var m = new CSR(Shape.matrix(10, 10), 
+        cell(5, 5, 9),
+        cell(1, 1, 87),
+        cell(9, 7, 3)
+      );
+
+    System.out.println(m);
 
     // printMatrix(SPARSE_2X3.times(FULL_3X2));
 
