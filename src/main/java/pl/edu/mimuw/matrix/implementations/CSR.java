@@ -211,11 +211,6 @@ public class CSR implements IDoubleMatrix {
       return this;
     }
 
-    /*
-     * Skoro większość komórek była zerowa, to po dodaniu niezerowej
-     * większość będzie niezerowa.
-     */
-
     return new Full(this.data()).plus(scalar);
   }
 
@@ -229,11 +224,6 @@ public class CSR implements IDoubleMatrix {
     if (Math.abs(scalar) == 0.0) {
       return this;
     }
-
-    /*
-     * Skoro większość komórek była zerowa, to po dodaniu niezerowej
-     * większość będzie niezerowa.
-     */
 
     return new Full(this.data()).minus(scalar);
   }
@@ -265,22 +255,6 @@ public class CSR implements IDoubleMatrix {
       }
     }
 
-    /*
-     * 
-     * for (int i = 0; i < this.shape.rows; i++) {
-     * int rowPtr = this.row[i];
-     * int rowPtrEnd = this.row[i + 1];
-     * 
-     * for (int j = 0; j < this.shape.columns; j++) {
-     * if (rowPtr < rowPtrEnd && this.column[rowPtr] == j) {
-     * data[i][j] = this.value[rowPtr++];
-     * } else {
-     * data[i][j] = 0.0;
-     * }
-     * }
-     * }
-     */
-
     return data;
   }
 
@@ -294,19 +268,6 @@ public class CSR implements IDoubleMatrix {
         columnSums[this.getColumn(ptr)] += Math.abs(this.getValue(ptr));
       }
     }
-
-    /*
-     * for (int i = 0; i < this.shape.rows; i++) {
-     * int rowPtr = this.row[i];
-     * int rowPtrEnd = this.row[i + 1];
-     * 
-     * while (rowPtr < rowPtrEnd) {
-     * columnSums[this.column[rowPtr]] += Math.abs(this.value[rowPtr]);
-     * 
-     * rowPtr++;
-     * }
-     * }
-     */
 
     // Pick the max
     double maxColumnSum = -1;
@@ -392,7 +353,7 @@ public class CSR implements IDoubleMatrix {
           }
         }
 
-        // Push unmatched
+        // Push unmatched columns
         while (thisPtr < this.getRowEnd(thisRi)) {
           values[index++] = new MatrixCellValue(r, this.getColumn(thisPtr), this.getValue(thisPtr));
           thisPtr++;
@@ -406,6 +367,7 @@ public class CSR implements IDoubleMatrix {
         thisRi++;
         otherRi++;
       } else if (this.getRowNumber(thisRi) < other.getRowNumber(otherRi)) {
+        // Push unmatched row from this
         for (int thisPtr = this.getRowStart(thisRi); thisPtr < this.getRowEnd(thisRi); thisPtr++) {
           values[index++] = new MatrixCellValue(this.getRowNumber(thisRi), this.getColumn(thisPtr),
               this.getValue(thisPtr));
@@ -413,6 +375,7 @@ public class CSR implements IDoubleMatrix {
 
         thisRi++;
       } else {
+        // Push unmatched row from other
         for (int otherPtr = other.getRowStart(otherRi); otherPtr < other.getRowEnd(otherRi); otherPtr++) {
           values[index++] = new MatrixCellValue(other.getRowNumber(otherRi), other.getColumn(otherPtr),
               other.getValue(otherPtr));
@@ -512,8 +475,8 @@ public class CSR implements IDoubleMatrix {
         double sum = 0;
 
         for (int ptr = other.getRowStart(ri); ptr < other.getRowEnd(ri); ptr++) {
-          sum += other.getValue(ptr) * 
-            this.get(other.getColumn(ptr), c);
+          sum += other.getValue(ptr) *
+              this.get(other.getColumn(ptr), c);
         }
 
         if (sum != 0) {
@@ -575,13 +538,14 @@ public class CSR implements IDoubleMatrix {
 
     for (int r = 0; r < other.shape().rows; r++) {
       double scalar = other.get(r, other.indexCompliment(r));
+      int ri = this.getRowPointer(other.indexCompliment(r));
 
       if (scalar == 0) {
         continue;
       }
 
-      for (int ptr = this.getRowStart(this.getRowPointer(other.indexCompliment(r))); ptr < this
-          .getRowEnd(this.getRowPointer(other.indexCompliment(r))); ptr++) {
+      for (int ptr = this.getRowStart(ri); ptr < this
+          .getRowEnd(ri); ptr++) {
         double value = scalar * this.getValue(ptr);
 
         if (value != 0) {
