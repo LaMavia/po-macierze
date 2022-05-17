@@ -86,7 +86,6 @@ public class AntiDiagonal extends Diagonal {
     assert other.size() == this.size();
 
     int zeroCount = 0, oneCount = 0;
-
     double[] values = new double[this.size()];
 
     for (int i = 0; i < this.size(); i++) {

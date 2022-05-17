@@ -106,7 +106,7 @@ public class RowMatrix extends BaseMatrix {
   public IDoubleMatrix times(IDoubleMatrix other) {
     assert other != null;
 
-    return other.times(this);
+    return super.times(other);
   }
 
   @Override

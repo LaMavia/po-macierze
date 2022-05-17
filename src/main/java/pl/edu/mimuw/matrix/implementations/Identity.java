@@ -123,8 +123,9 @@ public class Identity extends BaseMatrix {
 
     for (int r = 0; r < this.size; r++) {
       boolean visitedDiagonal = false;
+      int ri = other.getRowPointer(r);
 
-      for (int i = other.getRowStart(r); i < other.getRowEnd(r); i++) {
+      for (int i = other.getRowStart(ri); i < other.getRowEnd(ri); i++) {
         double value = other.getValue(i);
 
         if (other.getColumn(i) == r) {

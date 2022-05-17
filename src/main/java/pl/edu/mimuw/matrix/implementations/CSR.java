@@ -7,7 +7,7 @@ import pl.edu.mimuw.matrix.IDoubleMatrix;
 import pl.edu.mimuw.matrix.MatrixCellValue;
 import pl.edu.mimuw.matrix.Shape;
 
-public class CSR implements IDoubleMatrix {
+public class CSR extends BaseMatrix {
   public final int nnz;
   public final int ner;
   private final double[] value;
@@ -408,7 +408,9 @@ public class CSR implements IDoubleMatrix {
         data[i][j] = other.get(i, j);
       }
 
-      for (int ptr = this.getRowStart(i); ptr < this.getRowEnd(i); ptr++) {
+      int ri = this.getRowPointer(i);
+
+      for (int ptr = this.getRowStart(ri); ptr < this.getRowEnd(ri); ptr++) {
         data[i][this.getColumn(ptr)] += this.getValue(ptr);
       }
     }
@@ -605,10 +607,10 @@ public class CSR implements IDoubleMatrix {
     } else if (distance == 2) {
       out = this.getValue(ptr) + " 0 ";
     } else {
-      out = this.getValue(ptr) + " ";
+      out = this.getValue(ptr) + " " + (last ? "0" : "");
     }
 
-    return out + (last ? "0" : "");
+    return out;
   }
 
   private String stringifyRow(int row) {

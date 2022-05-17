@@ -21,42 +21,73 @@ import static pl.edu.mimuw.matrix.Shape.matrix;
 import static pl.edu.mimuw.matrix.DoubleMatrixFactory.*;
 
 public class Main {
+  private final static String spacer = "======================";
 
-  private static void printMatrix(IDoubleMatrix m) {
-    System.out.println("\n" + m);
+  private static void runBinary(IDoubleMatrix a, IDoubleMatrix b) {
+    System.out.printf("%s\n Combining:\n A =\n%s\n B =\n%s\n", spacer, a, b);
 
-    for (var row : m.data()) {
-      System.out.println(Arrays.toString(row));
+    if (a.shape().equals(b.shape())) {
+      var r = a.plus(b);
+      System.out.printf("A + B =\n%s\n", r);
+
+      r = a.minus(b);
+      System.out.printf("A - B =\n%s\n", r);
     }
+
+    if (a.shape().columns == b.shape().rows) {
+      var r = a.times(b);
+      System.out.printf("A * B =\n%s\n", r);
+    }
+
+    System.out.println(spacer);
+  }
+
+  private static void runUnary(IDoubleMatrix m) {
+    System.out.printf("%s\n Testing:\n M =\n%s", spacer, m);
+
+    System.out.printf("||M||_1 = %f\n", m.normOne());
+    System.out.printf("||M||_∞ = %f\n", m.normInfinity());
+    System.out.printf("||M||_F = %f\n", m.frobeniusNorm());
+
+    System.out.println(spacer);
   }
 
   public static void main(String[] args) {
-    /*
-     * var a = new RowMatrix(Shape.matrix(3, 3), new double[] { 4, 5, 6 });
-     * 
-     * printMatrix(a);
-     * 
-     * printMatrix(new Diagonal(1, 2, 3).times(a));
-     */
+    IDoubleMatrix[] matrices = new IDoubleMatrix[] {
+        new CSR(matrix(10, 10),
+            cell(0, 0, 1),
+            cell(2, 3, 2),
+            cell(2, 8, 3),
+            cell(6, 0, 4),
+            cell(7, 2, 5),
+            cell(7, 1, 6)),
+        new Zero(matrix(10, 10)),
+        new Vector(1, 2, 0, 0, 7),
+        new Identity(10),
+        new RowMatrix(matrix(10, 10), new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }),
+        new ColumnMatrix(matrix(10, 10), new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }),
+        new Diagonal(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+        new AntiDiagonal(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+        new Full(new double[][] {
+            new double[] { 1, 2, 3, 4, 5, 1, 7, 8, 9, 10 },
+            new double[] { 1, 2, 3, 4, 5, 1, 7, 8, 9, 10 },
+            new double[] { 1, 2, 3, 4, 5, 2, 7, 8, 9, 10 },
+            new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+            new double[] { 1, 2, 7, 4, 5, 2, 7, 8, 9, 10 },
+            new double[] { 1, 0, 3, 4, 5, 6, 7, 8, 9, 10 },
+            new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+            new double[] { 1, 2, 3, 1, 5, 6, 7, 8, 9, 10 },
+            new double[] { 1, 2, 3, 4, 5, 8, 7, 8, 9, 10 },
+            new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+        })
+    };
 
-    // System.out.println(new AntiDiagonal(1, 2, 3, 4, 5, 6));
-    // System.out.println(new Diagonal(1, 2, 3, 4, 5, 6));
+    for (IDoubleMatrix a : matrices) {
+      for (IDoubleMatrix b : matrices) {
+        runBinary(a, b);
+      }
 
-    // System.out.println(new RowMatrix(Shape.matrix(5, 5), new double[] { 1, 2,
-    // 3, 4, 5 }));
-
-    var m = new CSR(Shape.matrix(10, 10),
-        cell(5, 5, 9),
-        cell(1, 1, 87),
-        cell(9, 7, 3));
-
-    var v = vector(1, 2, 3, 4, 5);
-    printMatrix(v);
-
-    // printMatrix(SPARSE_2X3.times(FULL_3X2));
-
-    // Tu trzeba wpisać kod testujący toString dla poszczególnych macierzy i
-    // wyników
-    // operacji
+      runUnary(a);
+    }
   }
 }

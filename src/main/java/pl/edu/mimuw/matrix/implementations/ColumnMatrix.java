@@ -41,7 +41,7 @@ public class ColumnMatrix extends RowMatrix {
   public IDoubleMatrix times(IDoubleMatrix other) {
     assert other != null;
 
-    return other.times(this);
+    return super.times(other);
   }
 
   @Override
@@ -121,7 +121,7 @@ public class ColumnMatrix extends RowMatrix {
 
   @Override
   public String toString() {
-    String out = super.toString();
+    String out = this.shape().toString() + "\n";
 
     for (int r = 0; r < this.shape.rows; r++) {
       if (this.shape.columns >= 3) {

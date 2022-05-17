@@ -241,10 +241,12 @@ public class Full extends BaseMatrix {
     MatrixCellValue[] data = new MatrixCellValue[0];
 
     for (int r = 0; r < other.shape().rows; r++) {
+      int ri = other.getRowPointer(r);
+
       for (int c = 0; c < this.shape.columns; c++) {
         double sum = 0;
 
-        for (int ptr = other.getRowStart(r); ptr < other.getRowEnd(r); ptr++) {
+        for (int ptr = other.getRowStart(ri); ptr < other.getRowEnd(ri); ptr++) {
           sum += other.getValue(ptr) * this.get(other.getColumn(ptr), c);
         }
 

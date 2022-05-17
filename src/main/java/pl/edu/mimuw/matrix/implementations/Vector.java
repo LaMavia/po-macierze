@@ -66,10 +66,11 @@ public class Vector extends BaseMatrix {
     double[] values = new double[this.numberOfRows()];
 
     for (int i = 0; i < this.numberOfRows(); i++) {
+      int rowPtr = other.getRowPointer(i);
       int thisRowIndex = 0;
       values[i] = 0;
 
-      for (int j = other.getRowStart(i); j < other.getRowEnd(i); j++) {
+      for (int j = other.getRowStart(rowPtr); j < other.getRowEnd(rowPtr); j++) {
         int columnIndex = other.getColumn(j);
 
         // Move the vector pointer

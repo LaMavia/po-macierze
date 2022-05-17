@@ -145,8 +145,9 @@ public class Diagonal extends BaseMatrix {
 
     for (int r = 0; r < this.values.length; r++) {
       boolean visitedDiagonal = false;
+      int ri = other.getRowPointer(r);
 
-      for (int i = other.getRowStart(r); i < other.getRowEnd(r); i++) {
+      for (int i = other.getRowStart(ri); i < other.getRowEnd(ri); i++) {
         double value = other.getValue(i);
 
         if (other.getColumn(i) == this.indexCompliment(r)) {
@@ -249,11 +250,13 @@ public class Diagonal extends BaseMatrix {
 
     int index = 0;
     for (int r = 0; r < this.size(); r++) {
+      int ri = other.getRowPointer(r);
+
       for (int c = 0; c < this.size(); c++) {
         double sum = 0;
 
         // @todo optimise
-        for (int rowPtr = other.getRowStart(r); rowPtr < other.getRowEnd(r); rowPtr++) {
+        for (int rowPtr = other.getRowStart(ri); rowPtr < other.getRowEnd(ri); rowPtr++) {
           sum += this.get(other.getColumn(rowPtr), c) * other.getValue(rowPtr);
         }
 
