@@ -1,11 +1,6 @@
 package pl.edu.mimuw;
 
-import java.util.Arrays;
-
-import pl.edu.mimuw.matrix.DoubleMatrixFactory;
 import pl.edu.mimuw.matrix.IDoubleMatrix;
-import pl.edu.mimuw.matrix.MatrixCellValue;
-import pl.edu.mimuw.matrix.Shape;
 import pl.edu.mimuw.matrix.implementations.AntiDiagonal;
 import pl.edu.mimuw.matrix.implementations.CSR;
 import pl.edu.mimuw.matrix.implementations.ColumnMatrix;
@@ -18,7 +13,6 @@ import pl.edu.mimuw.matrix.implementations.Zero;
 
 import static pl.edu.mimuw.matrix.MatrixCellValue.cell;
 import static pl.edu.mimuw.matrix.Shape.matrix;
-import static pl.edu.mimuw.matrix.DoubleMatrixFactory.*;
 
 public class Main {
   private final static String spacer = "======================";
